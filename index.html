@@ -3,65 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Media Analytics Dashboard</title>
+    <title>Social Analytics Dashboard</title>
     <link rel="icon" href="favicon.ico">
-
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Libraries for Excel parsing and chart generation -->
-    <script 
-        src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" 
-        xintegrity="sha512-r22gChDnGvBylk90+2e/ycr3RVr/me8z+YoSSIiZxjQsMVLAGz6M_2dEOfYogIIFeyA9Ok6NsfG5VOBaT-RkJA==" 
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script 
-        src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" 
-        xintegrity="sha512-WuRa+KfdHCSinWBIxJAq6oT1eT5C/uXw3RjWpNaeFdGv/rL4zpY39B/pNyI7yB3eI/3rGjIeNqjB34L/NlI1PA==" 
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    
-    <!-- The date-fns library will be embedded in the main script tag below -->
-
     <style>
-        /* Custom styles to match the requested branding */
-        @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            font-family: "Avenir Next LT Pro", "Nunito Sans", sans-serif;
-            background-color: #f0f1f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: #3b3b3a;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 102, 204, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #0066cc;
+        }
+
+        .section h2 {
+            color: #0066cc;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            color: #3b3b3a;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
             color: #3b3b3a;
         }
 
-        /* Brand Colors Configuration for Tailwind */
-        .bg-brand-yellow { background-color: #ffc72c; }
-        .bg-brand-blue { background-color: #0a4bb8; }
-        .text-brand-blue { color: #0a4bb8; }
-        .border-brand-blue { border-color: #0a4bb8; }
-        .hover\:bg-brand-blue-dark:hover { background-color: #083c93; }
+        input[type="file"],
+        select,
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="file"]:focus,
+        select:focus,
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-container input {
+            padding-right: 40px;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
 
         .btn {
-            @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-md shadow-sm text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue transition-colors duration-200;
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
-            @apply bg-gray-600 hover:bg-gray-700 focus:ring-gray-500;
+            background: linear-gradient(135deg, #0066cc 0%, #004499 100%);
+            color: white;
         }
 
-        .card {
-            @apply bg-white rounded-xl shadow-md p-6;
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
         }
 
-        /* Custom styles for form elements */
-        .form-select, .form-input {
-            @apply block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm rounded-md;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        
-        /* Spinner for loading states */
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #0a4bb8;
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #0066cc;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 102, 204, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: auto;
+        }
+
+        .error {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            color: #276749;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0066cc;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
             animation: spin 1s linear infinite;
         }
 
@@ -70,724 +247,866 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Chart-specific styles */
-        .chart-container .bar {
-            fill: #bfd7fd; /* celeste */
-            transition: opacity 0.2s;
+        .hidden {
+            display: none;
         }
-         .chart-container .bar:hover {
-            opacity: 0.8;
+
+        #chartPreview, #statsPreview {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
         }
-        .chart-container .marker {
-            fill: #0a4bb8; /* blu */
-            stroke: white;
-            stroke-width: 2px;
+
+        .download-section {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
         }
-        .chart-container .marker-label {
-            font-size: 11px;
-            font-weight: 700;
-            fill: #0a4bb8; /* blu */
-            text-anchor: middle;
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
-        .chart-container .axis-label {
-            font-size: 12px;
-            fill: #3b3b3a; /* grigio */
-        }
-        .chart-container .axis path,
-        .chart-container .axis line {
-            stroke: #d1d5db;
-        }
-        .chart-container .axis .tick text {
-            fill: #3b3b3a; /* grigio */
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 10px;
+            }
         }
     </style>
 </head>
-<body class="antialiased">
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Analytics Dashboard</h1>
+            <p>Analizza le performance dei tuoi contenuti social con grafici professionali</p>
+        </div>
 
-    <div id="app-container" class="min-h-screen">
-        <!-- Header -->
-        <header class="bg-brand-yellow py-4 shadow-md">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h1 class="text-3xl font-extrabold text-brand-blue tracking-tight">Dashboard di Analisi Social</h1>
-                <p class="text-brand-blue opacity-90 mt-1">Genera benchmark di performance per i tuoi contenuti</p>
+        <!-- Sezione 1: Caricamento File -->
+        <div class="section">
+            <h2>
+                <svg class="icon" viewBox="0 0 24 24">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                1. Caricamento File Excel
+            </h2>
+            <div class="form-group">
+                <label for="fileInput">Seleziona il file Excel con i dati di engagement:</label>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" />
             </div>
-        </header>
+            <div id="fileStatus" class="loading">
+                <div class="spinner"></div>
+                <span>Caricamento in corso...</span>
+            </div>
+        </div>
 
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-            <!-- Step 1: File Upload -->
-            <div id="upload-section" class="card">
-                <div class="flex items-center space-x-4">
-                     <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15l5-5m0 0l-5-5m5 5H7" /></svg>
+        <!-- Sezioni di configurazione (nascoste inizialmente) -->
+        <div id="configSections" class="hidden">
+            <!-- Sezione 2: Selezione Argomento -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+                    </svg>
+                    2. Selezione Argomento
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="topicSelect">Argomento:</label>
+                        <select id="topicSelect">
+                            <option value="">Seleziona un argomento...</option>
+                        </select>
                     </div>
-                    <div>
-                        <h2 class="text-xl font-bold text-brand-blue">1. Carica il tuo file Excel</h2>
-                        <p class="text-gray-600">Seleziona il file contenente i dati di engagement dei post.</p>
+                    <div class="form-group">
+                        <label for="topicFilter">Filtra argomenti:</label>
+                        <div class="search-container">
+                            <input type="text" id="topicFilter" placeholder="Cerca argomento...">
+                            <svg class="search-icon icon" viewBox="0 0 24 24">
+                                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
+                            </svg>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-6">
-                    <input type="file" id="excel-file" class="hidden" accept=".xlsx, .xls, .csv">
-                    <button id="upload-button" class="btn w-full sm:w-auto">
-                        <span id="upload-button-text">Seleziona File</span>
+            </div>
+
+            <!-- Sezione 3: Selezione KPI e Canale -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/>
+                    </svg>
+                    3. Configurazione Analisi
+                </h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="kpiSelect">KPI da analizzare:</label>
+                        <select id="kpiSelect">
+                            <option value="Visualizzazioni">Visualizzazioni</option>
+                            <option value="Interazioni">Interazioni</option>
+                            <option value="Commenti">Commenti</option>
+                            <option value="Like e reazioni">Like e reazioni</option>
+                            <option value="Condivisioni">Condivisioni</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="channelSelect">Canale:</label>
+                        <select id="channelSelect">
+                            <option value="tutti">Tutti i canali</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="periodSelect">Raggruppamento temporale:</label>
+                        <select id="periodSelect">
+                            <option value="day">Giorno</option>
+                            <option value="week">Settimana</option>
+                            <option value="15days">15 giorni</option>
+                            <option value="month">Mese</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button id="generateBtn" class="btn">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M5,3C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3H5M5,5H19V19H5V5M7,7V9H17V7H7M7,11V13H17V11H7M7,15V17H14V15H7Z"/>
+                        </svg>
+                        Genera Analisi
                     </button>
-                    <p id="file-name" class="mt-3 text-sm text-gray-500"></p>
                 </div>
-                 <div id="loading-spinner" class="hidden mt-4 flex items-center space-x-2">
-                    <div class="loader"></div>
-                    <p class="text-gray-600">Elaborazione del file in corso...</p>
-                </div>
-                 <div id="error-message" class="hidden mt-4 text-red-600 font-semibold"></div>
             </div>
+        </div>
 
-            <!-- Analysis Section (hidden by default) -->
-            <div id="analysis-section" class="hidden mt-8">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    
-                    <!-- Left Column: Filters -->
-                    <div class="lg:col-span-1 space-y-8">
-                        <div class="card">
-                             <div class="flex items-center space-x-4">
-                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1v-6a1 1 0 00-1-1h-6z" /></svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-brand-blue">2. Imposta i Filtri</h2>
-                                    <p class="text-gray-600">Definisci i parametri per l'analisi.</p>
-                                </div>
-                            </div>
-                            <div class="mt-6 space-y-6">
-                                <!-- Argomento -->
-                                <div>
-                                    <label for="argomento-filter" class="block text-sm font-bold text-gray-700">Argomento</label>
-                                    <input type="text" id="argomento-search" placeholder="Filtra argomenti..." class="form-input mt-1">
-                                    <select id="argomento-filter" class="form-select mt-2"></select>
-                                </div>
-                                <!-- KPI -->
-                                <div>
-                                    <label for="kpi-filter" class="block text-sm font-bold text-gray-700">KPI da esaminare</label>
-                                    <select id="kpi-filter" class="form-select mt-1">
-                                        <option value="Visualizzazioni">Visualizzazioni</option>
-                                        <option value="Interazioni">Interazioni</option>
-                                        <option value="Commenti">Commenti</option>
-                                        <option value="Like e reazioni">Like e reazioni</option>
-                                        <option value="Condivisioni">Condivisioni</option>
-                                    </select>
-                                </div>
-                                <!-- Canale -->
-                                <div>
-                                    <label for="canale-filter" class="block text-sm font-bold text-gray-700">Canale</label>
-                                    <select id="canale-filter" class="form-select mt-1"></select>
-                                </div>
-                                <!-- Time Range -->
-                                <div>
-                                    <label for="time-range-filter" class="block text-sm font-bold text-gray-700">Raggruppamento temporale</label>
-                                    <select id="time-range-filter" class="form-select mt-1">
-                                        <option value="day">Giorno</option>
-                                        <option value="week">Settimana</option>
-                                        <option value="15days">15 giorni</option>
-                                        <option value="month" selected>Mese</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Sezione Risultati (nascosta inizialmente) -->
+        <div id="resultsSection" class="hidden">
+            <!-- Sezione 6: Informazioni Sintetiche -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
+                    </svg>
+                    Informazioni Sintetiche
+                </h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalPosts">0</div>
+                        <div class="stat-label">Totale post pubblicati</div>
                     </div>
-
-                    <!-- Right Column: Results -->
-                    <div class="lg:col-span-2 space-y-8">
-                        
-                        <!-- Summary Info -->
-                        <div class="card">
-                             <div class="flex items-center space-x-4 mb-6">
-                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-brand-blue">3. Informazioni Sintetiche</h2>
-                                    <p class="text-gray-600">Riepilogo dei dati in base ai filtri selezionati.</p>
-                                </div>
-                            </div>
-                            <div id="summary-content-wrapper">
-                                <!-- SVG for summary will be generated here -->
-                            </div>
-                            <button id="download-summary-button" class="btn mt-6 w-full sm:w-auto">
-                                <span id="download-summary-text">Download Riepilogo (SVG)</span>
-                            </button>
-                        </div>
-
-                        <!-- Main Chart -->
-                        <div class="card">
-                            <div class="flex items-center space-x-4 mb-6">
-                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
-                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-bold text-brand-blue">4. Grafico di Benchmark</h2>
-                                    <p class="text-gray-600">Confronto tra la media complessiva e l'argomento selezionato.</p>
-                                </div>
-                            </div>
-                            <div id="chart-container" class="chart-container overflow-x-auto">
-                                <!-- Main chart SVG will be rendered here -->
-                            </div>
-                             <button id="download-chart-button" class="btn mt-6 w-full sm:w-auto">
-                                <span id="download-chart-text">Download Grafico (SVG)</span>
-                            </button>
-                        </div>
-
+                    <div class="stat-card">
+                        <div class="stat-value" id="topicPosts">0</div>
+                        <div class="stat-label">Post sull'argomento selezionato</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgOverall">0</div>
+                        <div class="stat-label">Media complessiva KPI</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgTopic">0</div>
+                        <div class="stat-label">Media KPI argomento</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <svg id="statsPreview" width="100%" height="250"></svg>
+                    <div class="download-section">
+                        <button id="downloadStats" class="btn btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                            </svg>
+                            Scarica Riepilogo SVG
+                        </button>
                     </div>
                 </div>
             </div>
 
-        </main>
+            <!-- Sezione 7: Grafico Principale -->
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/>
+                    </svg>
+                    Grafico di Benchmark
+                </h2>
+                <div class="chart-container">
+                    <svg id="chartPreview" width="100%" height="350"></svg>
+                    <div class="download-section">
+                        <button id="downloadChart" class="btn btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                            </svg>
+                            Scarica Grafico SVG
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="errorMsg" class="error hidden"></div>
+        <div id="successMsg" class="success hidden"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        let excelData = [];
+        let filteredData = [];
+        let allTopics = [];
+        let allChannels = [];
+
+        // Elementi DOM
+        const fileInput = document.getElementById('fileInput');
+        const fileStatus = document.getElementById('fileStatus');
+        const configSections = document.getElementById('configSections');
+        const resultsSection = document.getElementById('resultsSection');
+        const topicSelect = document.getElementById('topicSelect');
+        const topicFilter = document.getElementById('topicFilter');
+        const kpiSelect = document.getElementById('kpiSelect');
+        const channelSelect = document.getElementById('channelSelect');
+        const periodSelect = document.getElementById('periodSelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+
+        // Event Listeners
+        fileInput.addEventListener('change', handleFileUpload);
+        topicFilter.addEventListener('input', filterTopics);
+        generateBtn.addEventListener('click', generateAnalysis);
+        document.getElementById('downloadChart').addEventListener('click', () => downloadSVG('chart'));
+        document.getElementById('downloadStats').addEventListener('click', () => downloadSVG('stats'));
+
+        function showMessage(message, isError = false) {
+            const msgElement = isError ? errorMsg : successMsg;
+            const otherMsg = isError ? successMsg : errorMsg;
             
-            // --- NEW: Embedded date-fns library ---
-            const dateFns = {
-                _toInteger: function(e){
-                    if(null===e||!0===e||!1===e)return NaN;
-                    var t=Number(e);
-                    return isNaN(t)?t:t<0?Math.ceil(t):Math.floor(t)
-                },
-                
-                toDate: function(e){
-                    var t=this;
-                    if(arguments.length<1)throw new TypeError("1 argument required, but only "+arguments.length+" present");
-                    var r=Object.prototype.toString.call(e);
-                    if(e instanceof Date||"object"==typeof e&&"[object Date]"===r)return new Date(e.getTime());
-                    if("number"==typeof e||"[object Number]"===r)return new Date(e);
-                    if(!("string"==typeof e||"[object String]"===r))return new Date(NaN);
-                    const n = String(e).split('/');
-                    if (n.length === 3 && n[2].length === 4) {
-                       // Assuming DD/MM/YYYY
-                       return new Date(n[2], n[1] - 1, n[0]);
-                    }
-                    return new Date(e); // Fallback for other string formats
-                },
+            msgElement.textContent = message;
+            msgElement.classList.remove('hidden');
+            otherMsg.classList.add('hidden');
+            
+            setTimeout(() => msgElement.classList.add('hidden'), 5000);
+        }
 
-                startOfDay: function(e){
-                    var t=this.toDate(e);
-                    t.setHours(0,0,0,0);
-                    return t
-                },
-
-                startOfMonth: function(e){
-                    var t=this.toDate(e);
-                    t.setDate(1);
-                    t.setHours(0,0,0,0);
-                    return t
-                },
-
-                startOfWeek: function(e,t){
-                    var r=t&&t.weekStartsOn?this._toInteger(t.weekStartsOn):0;
-                    var n=this.toDate(e);
-                    var o=n.getDay();
-                    var a=(o<r?7:0)+o-r;
-                    n.setDate(n.getDate()-a);
-                    n.setHours(0,0,0,0);
-                    return n
-                },
-
-                addDays: function(e,t){
-                    var r=this.toDate(e);
-                    var n=this._toInteger(t);
-                    r.setDate(r.getDate()+n);
-                    return r
-                },
-                
-                differenceInDays: function(e,t){
-                    var r=this.toDate(e);
-                    var n=this.toDate(t);
-                    var o=r.getTime()-r.getTimezoneOffset()*6e4;
-                    var a=n.getTime()-n.getTimezoneOffset()*6e4;
-                    return Math.round((o-a)/864e5)
-                },
-
-                format: function(date, formatStr) {
-                    const d = this.toDate(date);
-                    if (isNaN(d)) return "Invalid Date";
-                    const year = d.getFullYear();
-                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
-                    const day = d.getDate().toString().padStart(2, '0');
-                    const monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
-                    
-                    let result = formatStr;
-                    result = result.replace(/yyyy/g, year);
-                    result = result.replace(/yy/g, String(year).slice(-2));
-                    result = result.replace(/MMM/g, monthNames[d.getMonth()]);
-                    result = result.replace(/MM/g, month);
-                    result = result.replace(/dd/g, day);
-                    return result;
-                }
-            };
-
-            // --- Library loading check (should always pass now) ---
-            if (typeof XLSX === 'undefined' || typeof d3 === 'undefined') {
-                console.error("A critical library (XLSX or D3) failed to load.");
-                document.getElementById('app-container').innerHTML = `<div class="p-8 text-center text-red-700">Errore critico: una libreria essenziale non è stata caricata. L'applicazione non può funzionare. Controlla la tua connessione a internet o eventuali blocchi di rete.</div>`;
-                return; 
+        function updateButtonState(button, state, originalText) {
+            switch(state) {
+                case 'loading':
+                    button.disabled = true;
+                    button.innerHTML = '<div class="spinner"></div> Caricamento...';
+                    break;
+                case 'success':
+                    button.disabled = true;
+                    button.innerHTML = '✓ Completato!';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                    }, 2000);
+                    break;
+                case 'error':
+                    button.disabled = true;
+                    button.innerHTML = '✗ Errore';
+                    setTimeout(() => {
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                    }, 2000);
+                    break;
+                default:
+                    button.disabled = false;
+                    button.innerHTML = originalText;
             }
+        }
 
-            // --- DOM ELEMENTS ---
-            const uploadButton = document.getElementById('upload-button');
-            const uploadButtonText = document.getElementById('upload-button-text');
-            const fileInput = document.getElementById('excel-file');
-            const fileNameDisplay = document.getElementById('file-name');
-            const loadingSpinner = document.getElementById('loading-spinner');
-            const errorMessage = document.getElementById('error-message');
-            const analysisSection = document.getElementById('analysis-section');
-            const argomentoSearch = document.getElementById('argomento-search');
-            const argomentoFilter = document.getElementById('argomento-filter');
-            const kpiFilter = document.getElementById('kpi-filter');
-            const canaleFilter = document.getElementById('canale-filter');
-            const timeRangeFilter = document.getElementById('time-range-filter');
-            const summaryWrapper = document.getElementById('summary-content-wrapper');
-            const chartContainer = document.getElementById('chart-container');
-            const downloadSummaryButton = document.getElementById('download-summary-button');
-            const downloadChartButton = document.getElementById('download-chart-button');
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fileStatus.style.display = 'block';
             
-            // --- STATE ---
-            let rawData = [];
-            let argomentoOptions = [];
-            const kpiMapping = {
-                'Visualizzazioni': 'Visualizzazioni',
-                'Interazioni': 'Interazioni',
-                'Commenti': 'Commenti',
-                'Like e reazioni': 'Like e reazioni',
-                'Condivisioni': 'Condivisioni'
-            };
+            try {
+                const data = await readExcelFile(file);
+                processExcelData(data);
+                populateSelectors();
+                configSections.classList.remove('hidden');
+                showMessage('File caricato con successo!', false);
+            } catch (error) {
+                console.error('Errore nel caricamento:', error);
+                showMessage('Errore nel caricamento del file. Verificare il formato.', true);
+            }
+            
+            fileStatus.style.display = 'none';
+        }
 
-            // --- EVENT LISTENERS ---
-            uploadButton.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', handleFile);
-            [argomentoFilter, kpiFilter, canaleFilter, timeRangeFilter].forEach(el => {
-                el.addEventListener('change', updateVisualizations);
-            });
-            argomentoSearch.addEventListener('input', filterArgomentoDropdown);
-            downloadSummaryButton.addEventListener('click', () => handleDownload('summary'));
-            downloadChartButton.addEventListener('click', () => handleDownload('chart'));
-
-
-            // --- FUNCTIONS ---
-
-            /**
-             * Handles the file upload process.
-             * @param {Event} event - The file input change event.
-             */
-            function handleFile(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                fileNameDisplay.textContent = `File selezionato: ${file.name}`;
-                loadingSpinner.style.display = 'flex';
-                errorMessage.style.display = 'none';
-                analysisSection.style.display = 'none';
-                uploadButtonText.textContent = 'Caricamento...';
-                uploadButton.disabled = true;
-
+        function readExcelFile(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                reader.onload = function(e) {
                     try {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
-                        const sheetName = 'Raccolta dati';
-                        if (!workbook.SheetNames.includes(sheetName)) {
-                           throw new Error(`Il file Excel deve contenere un foglio chiamato "${sheetName}".`);
-                        }
-                        const worksheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-                        processData(jsonData);
-                        
-                        analysisSection.style.display = 'block';
-                        updateVisualizations();
-
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        resolve(jsonData);
                     } catch (error) {
-                        console.error('Error processing file:', error);
-                        errorMessage.textContent = `Errore: ${error.message}`;
-                        errorMessage.style.display = 'block';
-                    } finally {
-                        loadingSpinner.style.display = 'none';
-                        uploadButtonText.textContent = 'Seleziona un altro file';
-                        uploadButton.disabled = false;
-                        fileInput.value = ''; // Reset file input
+                        reject(error);
                     }
                 };
-                reader.onerror = () => {
-                     errorMessage.textContent = 'Errore nella lettura del file.';
-                     errorMessage.style.display = 'block';
-                     loadingSpinner.style.display = 'none';
-                     uploadButtonText.textContent = 'Riprova';
-                     uploadButton.disabled = false;
-                };
+                reader.onerror = reject;
                 reader.readAsArrayBuffer(file);
+            });
+        }
+
+        function processExcelData(data) {
+            // Filtra solo i dati con Campagna = "Editoriale"
+            excelData = data.filter(row => 
+                row.Campagna && row.Campagna.toString().toLowerCase() === 'editoriale'
+            );
+
+            if (excelData.length === 0) {
+                throw new Error('Nessun dato trovato con Campagna = "Editoriale"');
             }
 
-            /**
-             * Processes and cleans the raw JSON data from the Excel file.
-             * @param {Array<Object>} jsonData - Data from the Excel sheet.
-             */
-            function processData(jsonData) {
-                // Filter for 'Editoriale' campaign and posts with a valid date
-                rawData = jsonData
-                    .filter(row => row['Campagna'] === 'Editoriale' && row['Data'])
-                    .map(row => {
-                        const kpiKeys = Object.values(kpiMapping);
-                        const newRow = { ...row };
-                        
-                        // Convert KPI columns to numbers, defaulting to 0 if invalid
-                        kpiKeys.forEach(kpi => {
-                            newRow[kpi] = Number(row[kpi]) || 0;
-                        });
+            // Estrai argomenti e canali unici
+            allTopics = [...new Set(excelData.map(row => row.Argomento).filter(Boolean))].sort();
+            allChannels = [...new Set(excelData.map(row => row.Canale).filter(Boolean))].sort();
 
-                        // Parse date using the embedded dateFns function
-                        newRow.date = dateFns.toDate(row['Data']);
-                        if (typeof row['Data'] === 'number') { // Handle Excel date serial number
-                           newRow.date = new Date(Math.round((row['Data'] - 25569) * 86400 * 1000));
-                        }
-                        
-                        return newRow;
-                    })
-                    .filter(row => row.date instanceof Date && !isNaN(row.date)); // Final check for valid dates
-                
-                if (rawData.length === 0) {
-                   throw new Error("Nessun dato 'Editoriale' valido trovato nel file. Controlla le colonne 'Campagna' e 'Data'.");
-                }
+            console.log(`Caricati ${excelData.length} record con Campagna "Editoriale"`);
+            console.log('Argomenti trovati:', allTopics);
+            console.log('Canali trovati:', allChannels);
+        }
 
-                populateFilters();
-            }
+        function populateSelectors() {
+            // Popola argomenti
+            topicSelect.innerHTML = '<option value="">Seleziona un argomento...</option>';
+            allTopics.forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic;
+                option.textContent = topic;
+                topicSelect.appendChild(option);
+            });
 
-            /**
-             * Populates the 'Argomento' and 'Canale' dropdowns based on loaded data.
-             */
-            function populateFilters() {
-                const argomenti = [...new Set(rawData.map(d => d['Argomento']).filter(Boolean))].sort();
-                const canali = [...new Set(rawData.map(d => d['Canale']).filter(Boolean))].sort();
+            // Popola canali
+            channelSelect.innerHTML = '<option value="tutti">Tutti i canali</option>';
+            allChannels.forEach(channel => {
+                const option = document.createElement('option');
+                option.value = channel;
+                option.textContent = channel;
+                channelSelect.appendChild(option);
+            });
+        }
 
-                argomentoOptions = argomenti.map(arg => `<option value="${arg}">${arg}</option>`);
-                argomentoFilter.innerHTML = argomentoOptions.join('');
-
-                canaleFilter.innerHTML = '<option value="all">Tutti i canali</option>' + 
-                    canali.map(c => `<option value="${c}">${c}</option>`).join('');
-            }
+        function filterTopics() {
+            const filter = topicFilter.value.toLowerCase();
             
-            /**
-             * Filters the Argomento dropdown based on text input.
-             */
-            function filterArgomentoDropdown() {
-                const searchTerm = argomentoSearch.value.toLowerCase();
-                const filteredOptions = argomentoOptions.filter(opt => opt.toLowerCase().includes(searchTerm));
-                argomentoFilter.innerHTML = filteredOptions.join('');
-            }
-
-            /**
-             * Main function to trigger updates to all visualizations.
-             */
-            function updateVisualizations() {
-                if (rawData.length === 0) return;
-
-                const filters = {
-                    argomento: argomentoFilter.value,
-                    kpi: kpiFilter.value,
-                    canale: canaleFilter.value,
-                    timeRange: timeRangeFilter.value
-                };
-                
-                // 1. Filter data based on channel
-                const channelFilteredData = (filters.canale === 'all')
-                    ? rawData
-                    : rawData.filter(d => d['Canale'] === filters.canale);
-
-                if (channelFilteredData.length === 0) {
-                    showNoDataMessage();
-                    return;
-                }
-
-                // 2. Generate data for chart
-                const chartData = generateChartData(channelFilteredData, filters);
-                
-                // 3. Update summary
-                updateSummary(channelFilteredData, filters);
-                
-                // 4. Draw chart
-                drawChart(chartData, filters.kpi);
-            }
-
-            function showNoDataMessage() {
-                summaryWrapper.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun post trovato per i filtri selezionati.</div>`;
-                chartContainer.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun dato da visualizzare nel grafico.</div>`;
-            }
-
-            /**
-             * Generates the structured data required for the D3 chart.
-             * @param {Array<Object>} data - The pre-filtered data.
-             * @param {Object} filters - Current filter values.
-             * @returns {Array<Object>} - Data ready for charting.
-             */
-            function generateChartData(data, filters) {
-                const kpi = kpiMapping[filters.kpi];
-                const getPeriodStart = (date) => {
-                    switch (filters.timeRange) {
-                        case 'day': return dateFns.startOfDay(date);
-                        case 'week': return dateFns.startOfWeek(date, { weekStartsOn: 1 });
-                        case '15days':
-                            const minDate = d3.min(data, d => d.date);
-                            const diff = dateFns.differenceInDays(date, minDate);
-                            const periodIndex = Math.floor(diff / 15);
-                            return dateFns.addDays(minDate, periodIndex * 15);
-                        case 'month': return dateFns.startOfMonth(date);
-                        default: return date;
-                    }
-                };
-
-                const grouped = d3.group(data, d => getPeriodStart(d.date).getTime());
-
-                const chartData = Array.from(grouped, ([timestamp, values]) => {
-                    const topicValues = values.filter(d => d['Argomento'] === filters.argomento);
-                    
-                    return {
-                        date: new Date(timestamp),
-                        overallAvg: d3.mean(values, v => v[kpi]),
-                        topicAvg: topicValues.length > 0 ? d3.mean(topicValues, v => v[kpi]) : null
-                    };
-                });
-                
-                return chartData.sort((a, b) => a.date - b.date);
-            }
+            // Prima rimuovi tutte le opzioni tranne la prima
+            const firstOption = topicSelect.children[0];
+            topicSelect.innerHTML = '';
+            topicSelect.appendChild(firstOption);
             
-             /**
-             * Formats a number into a compact string (e.g., 1.2K, 3.4M).
-             * @param {number} num - The number to format.
-             * @returns {string} - The formatted string.
-             */
-            function formatNumber(num) {
-                if (num === null || isNaN(num)) return 'N/A';
-                if (num === 0) return '0';
-                const absNum = Math.abs(num);
-                if (absNum >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-                if (absNum >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-                return num.toFixed(0);
+            // Aggiungi solo le opzioni che corrispondono al filtro
+            allTopics.forEach(topic => {
+                if (topic.toLowerCase().includes(filter)) {
+                    const option = document.createElement('option');
+                    option.value = topic;
+                    option.textContent = topic;
+                    topicSelect.appendChild(option);
+                }
+            });
+        }
+
+        function generateAnalysis() {
+            const topic = topicSelect.value;
+            const kpi = kpiSelect.value;
+            const channel = channelSelect.value;
+            const period = periodSelect.value;
+
+            if (!topic) {
+                showMessage('Seleziona un argomento per continuare.', true);
+                return;
             }
 
-            /**
-             * Updates the summary information box.
-             * @param {Array<Object>} data - Pre-filtered data.
-             * @param {Object} filters - Current filter values.
-             */
-            function updateSummary(data, filters) {
-                const kpi = kpiMapping[filters.kpi];
-                const topicData = data.filter(d => d['Argomento'] === filters.argomento);
+            const originalText = generateBtn.innerHTML;
+            updateButtonState(generateBtn, 'loading', originalText);
 
-                const summary = {
-                    totalPosts: data.length,
-                    topicPosts: topicData.length,
-                    overallAvg: d3.mean(data, d => d[kpi]),
-                    topicAvg: d3.mean(topicData, d => d[kpi])
-                };
+            try {
+                const analysisData = prepareAnalysisData(topic, kpi, channel, period);
+                createCharts(analysisData, topic, kpi, channel, period);
+                updateStatistics(analysisData, topic, kpi);
                 
-                const summarySVG = createSummarySVG(summary, filters.kpi);
-                summaryWrapper.innerHTML = '';
-                summaryWrapper.appendChild(summarySVG);
+                resultsSection.classList.remove('hidden');
+                updateButtonState(generateBtn, 'success', originalText);
+                showMessage('Analisi generata con successo!', false);
+                
+                // Scroll to results
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Errore nella generazione:', error);
+                updateButtonState(generateBtn, 'error', originalText);
+                showMessage('Errore nella generazione dell\'analisi.', true);
+            }
+        }
+
+        function prepareAnalysisData(topic, kpi, channel, period) {
+            // Filtra i dati in base al canale
+            let workingData = excelData;
+            if (channel !== 'tutti') {
+                workingData = excelData.filter(row => row.Canale === channel);
             }
 
-            /**
-             * Creates an SVG element for the summary info.
-             */
-            function createSummarySVG(summary, kpiName) {
-                const svg = d3.create("svg")
-                    .attr("viewBox", "0 0 500 150")
-                    .attr("id", "summary-svg")
-                    .style("font-family", '"Avenir Next LT Pro", "Nunito Sans", sans-serif')
-                    .style("background-color", "#ffffff");
+            // Converti le date e raggruppa per periodo
+            const groupedData = groupByPeriod(workingData, period);
+            
+            // Calcola medie per periodo
+            const analysisData = [];
+            
+            Object.keys(groupedData).sort().forEach(periodKey => {
+                const periodData = groupedData[periodKey];
+                const allPosts = periodData;
+                const topicPosts = periodData.filter(row => row.Argomento === topic);
+                
+                if (allPosts.length > 0) {
+                    const avgAll = calculateAverage(allPosts, kpi);
+                    const avgTopic = topicPosts.length > 0 ? calculateAverage(topicPosts, kpi) : null;
+                    
+                    analysisData.push({
+                        period: periodKey,
+                        avgAll: avgAll,
+                        avgTopic: avgTopic,
+                        totalPosts: allPosts.length,
+                        topicPosts: topicPosts.length
+                    });
+                }
+            });
 
-                const data = [
-                    { label: "Totale post pubblicati", value: formatNumber(summary.totalPosts) },
-                    { label: `Post sull'argomento`, value: formatNumber(summary.topicPosts) },
-                    { label: `Media complessiva ${kpiName}`, value: formatNumber(summary.overallAvg) },
-                    { label: `Media argomento ${kpiName}`, value: formatNumber(summary.topicAvg) }
-                ];
+            return analysisData;
+        }
 
-                const items = svg.selectAll("g.summary-item")
-                    .data(data)
-                    .join("g")
-                    .attr("class", "summary-item")
-                    .attr("transform", (d, i) => `translate(${i % 2 === 0 ? 30 : 270}, ${i < 2 ? 40 : 100})`);
-
-                items.append("text")
-                    .text(d => d.value)
-                    .attr("font-size", "28px")
-                    .attr("font-weight", "800")
-                    .attr("fill", "#0a4bb8"); // blu
-
-                items.append("text")
-                    .text(d => d.label)
-                    .attr("y", 20)
-                    .attr("font-size", "14px")
-                    .attr("fill", "#3b3b3a"); // grigio
-
-                return svg.node();
-            }
-
-            /**
-             * Draws the main D3 bar chart.
-             * @param {Array<Object>} data - Chart-ready data.
-             * @param {string} kpiName - The name of the KPI being displayed.
-             */
-            function drawChart(data, kpiName) {
-                chartContainer.innerHTML = ''; // Clear previous chart
-                if (data.length === 0) {
-                   chartContainer.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun dato da visualizzare per il periodo selezionato.</div>`;
-                   return;
+        function groupByPeriod(data, period) {
+            const grouped = {};
+            
+            data.forEach(row => {
+                if (!row.Data) return;
+                
+                let date;
+                try {
+                    // Prova diversi formati di data
+                    if (typeof row.Data === 'number') {
+                        date = new Date((row.Data - 25569) * 86400 * 1000); // Excel date
+                    } else {
+                        date = new Date(row.Data);
+                    }
+                } catch {
+                    return; // Salta righe con date non valide
                 }
                 
-                const width = 1200;
-                const height = 275;
-                const margin = { top: 40, right: 20, bottom: 50, left: 60 };
-
-                const svg = d3.create("svg")
-                    .attr("viewBox", `0 0 ${width} ${height}`)
-                    .attr("id", "main-chart-svg")
-                    .style("max-width", "100%")
-                    .style("height", "auto");
-
-                const x = d3.scaleBand()
-                    .domain(data.map(d => d.date))
-                    .range([margin.left, width - margin.right])
-                    .padding(0.3);
-
-                const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => Math.max(d.overallAvg, d.topicAvg || 0))]).nice()
-                    .range([height - margin.bottom, margin.top]);
-
-                // X-Axis
-                const xAxis = g => g
-                    .attr("transform", `translate(0,${height - margin.bottom})`)
-                    .call(d3.axisBottom(x).tickFormat(d => {
-                        const timeRange = timeRangeFilter.value;
-                        if (timeRange === 'day') return dateFns.format(d, 'dd/MM');
-                        if (timeRange === 'week' || timeRange === '15days') return dateFns.format(d, 'dd/MM/yy');
-                        return dateFns.format(d, 'MMM yy');
-                    }).tickSizeOuter(0));
+                if (isNaN(date.getTime())) return;
                 
-                // Y-Axis
-                const yAxis = g => g
-                    .attr("transform", `translate(${margin.left},0)`)
-                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => formatNumber(d)))
-                    .call(g => g.select(".domain").remove()) // Remove axis line
-                    .call(g => g.selectAll(".tick line").clone() // Add grid lines
-                        .attr("x2", width - margin.left - margin.right)
-                        .attr("stroke-opacity", 0.1));
-
-                svg.append("g").call(xAxis).attr("class", "axis");
-                svg.append("g").call(yAxis).attr("class", "axis");
+                let periodKey;
+                switch (period) {
+                    case 'day':
+                        periodKey = date.toISOString().split('T')[0];
+                        break;
+                    case 'week':
+                        const week = getWeekNumber(date);
+                        periodKey = `${date.getFullYear()}-W${week.toString().padStart(2, '0')}`;
+                        break;
+                    case '15days':
+                        const day15 = Math.ceil(date.getDate() / 15);
+                        periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-Q${day15}`;
+                        break;
+                    case 'month':
+                        periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                        break;
+                }
                 
-                // Y-Axis Label
-                svg.append("text")
-                    .attr("class", "axis-label")
-                    .attr("x", -margin.left)
-                    .attr("y", 15)
-                    .attr("dy", "0.32em")
-                    .attr("fill", "currentColor")
-                    .attr("font-weight", "bold")
-                    .text(kpiName);
+                if (!grouped[periodKey]) {
+                    grouped[periodKey] = [];
+                }
+                grouped[periodKey].push(row);
+            });
+            
+            return grouped;
+        }
 
-                // Bars
-                svg.append("g")
-                    .selectAll("rect")
-                    .data(data)
-                    .join("rect")
-                    .attr("class", "bar")
-                    .attr("x", d => x(d.date))
-                    .attr("y", d => y(d.overallAvg))
-                    .attr("height", d => y(0) - y(d.overallAvg))
-                    .attr("width", x.bandwidth());
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
 
-                const markerGroup = svg.append("g")
-                    .selectAll("g")
-                    .data(data.filter(d => d.topicAvg !== null && d.topicAvg >= 0))
-                    .join("g");
+        function calculateAverage(data, kpi) {
+            const values = data.map(row => parseFloat(row[kpi]) || 0).filter(val => val > 0);
+            return values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+        }
 
-                // Markers
-                markerGroup.append("circle")
-                    .attr("class", "marker")
-                    .attr("cx", d => x(d.date) + x.bandwidth() / 2)
-                    .attr("cy", d => y(d.topicAvg))
-                    .attr("r", 5);
-                
-                // Marker Labels
-                markerGroup.append("text")
-                    .attr("class", "marker-label")
-                    .attr("x", d => x(d.date) + x.bandwidth() / 2)
-                    .attr("y", d => y(d.topicAvg) - 10)
-                    .text(d => formatNumber(d.topicAvg));
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                let formatted = (num / 1000000).toFixed(2);
+                // Rimuove gli zeri finali dopo la virgola
+                formatted = formatted.replace(/\.?0+$/, '');
+                return formatted.replace('.', ',') + 'M';
+            }
+            if (num >= 1000) {
+                let formatted = (num / 1000).toFixed(2);
+                // Rimuove gli zeri finali dopo la virgola
+                formatted = formatted.replace(/\.?0+$/, '');
+                return formatted.replace('.', ',') + 'K';
+            }
+            return Math.round(num).toString().replace('.', ',');
+        }
 
-                chartContainer.appendChild(svg.node());
+        function formatPeriodLabel(periodKey, period) {
+            switch (period) {
+                case 'day':
+                    return new Date(periodKey).toLocaleDateString('it-IT', { 
+                        day: '2-digit', 
+                        month: '2-digit' 
+                    });
+                case 'week':
+                    const [year, week] = periodKey.split('-W');
+                    return `S${week}/${year.substr(2)}`;
+                case '15days':
+                    const [y, m, q] = periodKey.split('-');
+                    const quarter = q === 'Q1' ? '1-15' : '16-31';
+                    return `${quarter}/${m}`;
+                case 'month':
+                    const [yr, mn] = periodKey.split('-');
+                    return `${mn}/${yr.substr(2)}`;
+                default:
+                    return periodKey;
+            }
+        }
+
+        function createCharts(analysisData, topic, kpi, channel, period) {
+            createMainChart(analysisData, topic, kpi, channel, period);
+            createStatsChart(analysisData, topic, kpi);
+        }
+
+        function createMainChart(analysisData, topic, kpi, channel, period) {
+            const svg = document.getElementById('chartPreview');
+            svg.innerHTML = '';
+            
+            // Dimensioni adattive
+            const containerWidth = Math.max(800, svg.clientWidth);
+            const width = containerWidth;
+            const height = 350;
+            const margin = { top: 40, right: 30, bottom: 80, left: 80 };
+            const chartWidth = width - margin.left - margin.right;
+            const chartHeight = height - margin.top - margin.bottom;
+
+            // Colori
+            const lightBlue = '#bfd7fd';
+            const darkBlue = '#0066cc';
+            const gray = '#3b3b3a';
+
+            // Trova i valori massimi per la scala
+            const maxValue = Math.max(...analysisData.map(d => Math.max(d.avgAll, d.avgTopic || 0)));
+            const yScale = chartHeight / (maxValue * 1.2);
+
+            // Larghezza delle barre
+            const barWidth = Math.max(20, chartWidth / analysisData.length - 10);
+            const barSpacing = chartWidth / analysisData.length;
+
+            // Crea viewBox per mantenere le proporzioni
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+            // Sfondo
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', 'white');
+            svg.appendChild(rect);
+
+            // Titolo
+            const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            title.setAttribute('x', width / 2);
+            title.setAttribute('y', 25);
+            title.setAttribute('text-anchor', 'middle');
+            title.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            title.setAttribute('font-size', '16');
+            title.setAttribute('font-weight', 'bold');
+            title.setAttribute('fill', darkBlue);
+            title.textContent = `Benchmark ${kpi} - "${topic}" vs Media${channel !== 'tutti' ? ` (${channel})` : ''}`;
+            svg.appendChild(title);
+
+            // Griglia orizzontale
+            const gridLines = 5;
+            for (let i = 0; i <= gridLines; i++) {
+                const y = margin.top + (chartHeight / gridLines) * i;
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', margin.left);
+                line.setAttribute('x2', margin.left + chartWidth);
+                line.setAttribute('y1', y);
+                line.setAttribute('y2', y);
+                line.setAttribute('stroke', '#e9ecef');
+                line.setAttribute('stroke-width', '1');
+                svg.appendChild(line);
+
+                // Etichette Y
+                const value = (maxValue * 1.2) * (gridLines - i) / gridLines;
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', margin.left - 10);
+                label.setAttribute('y', y + 5);
+                label.setAttribute('text-anchor', 'end');
+                label.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                label.setAttribute('font-size', '12');
+                label.setAttribute('fill', gray);
+                label.textContent = formatNumber(value);
+                svg.appendChild(label);
             }
 
-            /**
-             * Handles downloading the specified SVG element.
-             * @param {string} type - 'summary' or 'chart'.
-             */
-            function handleDownload(type) {
-                const button = (type === 'summary') ? downloadSummaryButton : downloadChartButton;
-                const buttonText = button.querySelector('span');
-                const originalText = buttonText.textContent;
+            // Barre e marker
+            analysisData.forEach((data, index) => {
+                const x = margin.left + index * barSpacing + (barSpacing - barWidth) / 2;
+                
+                // Barra azzurra (media generale)
+                const barHeight = data.avgAll * yScale;
+                const barY = margin.top + chartHeight - barHeight;
+                
+                const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                bar.setAttribute('x', x);
+                bar.setAttribute('y', barY);
+                bar.setAttribute('width', barWidth);
+                bar.setAttribute('height', barHeight);
+                bar.setAttribute('fill', lightBlue);
+                svg.appendChild(bar);
 
-                buttonText.textContent = 'Preparazione...';
-                button.disabled = true;
+                // Marker blu scuro (argomento specifico) se presente
+                if (data.avgTopic !== null && data.avgTopic > 0) {
+                    const markerY = margin.top + chartHeight - (data.avgTopic * yScale);
+                    
+                    // Cerchio marker
+                    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    marker.setAttribute('cx', x + barWidth / 2);
+                    marker.setAttribute('cy', markerY);
+                    marker.setAttribute('r', '6');
+                    marker.setAttribute('fill', darkBlue);
+                    marker.setAttribute('stroke', 'white');
+                    marker.setAttribute('stroke-width', '2');
+                    svg.appendChild(marker);
 
-                setTimeout(() => { // Timeout to allow UI to update
-                    const svgNode = document.getElementById(type === 'summary' ? 'summary-svg' : 'main-chart-svg');
-                    if (!svgNode) {
-                        console.error('SVG node not found for download');
-                        buttonText.textContent = 'Errore';
-                        setTimeout(() => {
-                           buttonText.textContent = originalText;
-                           button.disabled = false;
-                        }, 2000);
-                        return;
-                    }
-                    
-                    const filename = type === 'summary' ? 'riepilogo_dati.svg' : 'grafico_benchmark.svg';
-                    
-                    // Clone the SVG to avoid modifying the displayed one
-                    const svgClone = svgNode.cloneNode(true);
-                    
-                    // Add an explicit font-family style to the clone for better compatibility
-                    svgClone.style.fontFamily = '"Avenir Next LT Pro", "Nunito Sans", sans-serif';
+                    // Etichetta valore
+                    const valueLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    valueLabel.setAttribute('x', x + barWidth / 2);
+                    valueLabel.setAttribute('y', markerY - 15);
+                    valueLabel.setAttribute('text-anchor', 'middle');
+                    valueLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                    valueLabel.setAttribute('font-size', '11');
+                    valueLabel.setAttribute('font-weight', 'bold');
+                    valueLabel.setAttribute('fill', darkBlue);
+                    valueLabel.textContent = formatNumber(data.avgTopic);
+                    svg.appendChild(valueLabel);
+                }
 
-                    const serializer = new XMLSerializer();
-                    let source = serializer.serializeToString(svgClone);
+                // Etichette asse X
+                const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                xLabel.setAttribute('x', x + barWidth / 2);
+                xLabel.setAttribute('y', margin.top + chartHeight + 20);
+                xLabel.setAttribute('text-anchor', 'middle');
+                xLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                xLabel.setAttribute('font-size', '12');
+                xLabel.setAttribute('fill', gray);
+                xLabel.textContent = formatPeriodLabel(data.period, period);
+                svg.appendChild(xLabel);
+            });
 
-                    // Add XML namespace
-                    if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
-                        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-                    }
-                    
-                    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
-                    buttonText.textContent = 'Fatto!';
-                    setTimeout(() => {
-                        buttonText.textContent = originalText;
-                        button.disabled = false;
-                    }, 2000);
+            // Legenda in basso a sinistra
+            const legendX = margin.left;
+            const legendY = margin.top + chartHeight + 50;
+            
+            // Legenda barra azzurra
+            const legendBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            legendBar.setAttribute('x', legendX);
+            legendBar.setAttribute('y', legendY);
+            legendBar.setAttribute('width', '15');
+            legendBar.setAttribute('height', '15');
+            legendBar.setAttribute('fill', lightBlue);
+            svg.appendChild(legendBar);
 
-                }, 100);
-            }
+            const legendText1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            legendText1.setAttribute('x', legendX + 25);
+            legendText1.setAttribute('y', legendY + 12);
+            legendText1.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            legendText1.setAttribute('font-size', '12');
+            legendText1.setAttribute('fill', gray);
+            legendText1.textContent = 'Media generale';
+            svg.appendChild(legendText1);
+
+            // Legenda marker
+            const legendMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            legendMarker.setAttribute('cx', legendX + 150);
+            legendMarker.setAttribute('cy', legendY);
+            legendMarker.setAttribute('r', '6');
+            legendMarker.setAttribute('fill', darkBlue);
+            svg.appendChild(legendMarker);
+
+            const legendText2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            legendText2.setAttribute('x', legendX + 175);
+            legendText2.setAttribute('y', legendY + 12);
+            legendText2.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            legendText2.setAttribute('font-size', '12');
+            legendText2.setAttribute('fill', gray);
+            const truncatedTopic = topic.length > 20 ? topic.substring(0, 17) + '...' : topic;
+            legendText2.textContent = `"${truncatedTopic}"`;
+            svg.appendChild(legendText2);
+        }
+
+        function createStatsChart(analysisData, topic, kpi) {
+            const svg = document.getElementById('statsPreview');
+            svg.innerHTML = '';
+            
+            const width = 400;
+            const height = 250;
+            
+            // Usa viewBox per mantenere le proporzioni
+            svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+            
+            // Colori
+            const lightBlue = '#bfd7fd';
+            const darkBlue = '#0066cc';
+            const gray = '#3b3b3a';
+
+            // Sfondo
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('width', width);
+            rect.setAttribute('height', height);
+            rect.setAttribute('fill', 'white');
+            svg.appendChild(rect);
+
+            // Titolo con argomento specifico tra virgolette
+            const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            title.setAttribute('x', width / 2);
+            title.setAttribute('y', 25);
+            title.setAttribute('text-anchor', 'middle');
+            title.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            title.setAttribute('font-size', '14');
+            title.setAttribute('font-weight', 'bold');
+            title.setAttribute('fill', darkBlue);
+            title.textContent = `Riepilogo Statistiche - ${kpi}`;
+            svg.appendChild(title);
+
+            // Sottotitolo con argomento
+            const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            subtitle.setAttribute('x', width / 2);
+            subtitle.setAttribute('y', 45);
+            subtitle.setAttribute('text-anchor', 'middle');
+            subtitle.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            subtitle.setAttribute('font-size', '12');
+            subtitle.setAttribute('fill', gray);
+            const truncatedTopic = topic.length > 30 ? topic.substring(0, 27) + '...' : topic;
+            subtitle.textContent = `Argomento: "${truncatedTopic}"`;
+            svg.appendChild(subtitle);
+
+            // Calcola le statistiche
+            const totalPosts = analysisData.reduce((sum, d) => sum + d.totalPosts, 0);
+            const topicPostsCount = analysisData.reduce((sum, d) => sum + d.topicPosts, 0);
+            const avgAll = analysisData.reduce((sum, d) => sum + d.avgAll, 0) / analysisData.length;
+            const topicData = analysisData.filter(d => d.avgTopic !== null);
+            const avgTopic = topicData.length > 0 ? 
+                topicData.reduce((sum, d) => sum + d.avgTopic, 0) / topicData.length : 0;
+
+            // Posizioni per i box informativi
+            const boxes = [
+                { label: 'Post Totali', value: totalPosts, x: 50, y: 85 },
+                { label: 'Post Argomento', value: topicPostsCount, x: 250, y: 85 },
+                { label: 'Media Generale', value: avgAll, x: 50, y: 145 },
+                { label: 'Media Argomento', value: avgTopic, x: 250, y: 145 }
+            ];
+
+            boxes.forEach(box => {
+                // Box
+                const boxRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                boxRect.setAttribute('x', box.x - 40);
+                boxRect.setAttribute('y', box.y - 20);
+                boxRect.setAttribute('width', '130');
+                boxRect.setAttribute('height', '50');
+                boxRect.setAttribute('fill', lightBlue);
+                boxRect.setAttribute('stroke', darkBlue);
+                boxRect.setAttribute('rx', '5');
+                svg.appendChild(boxRect);
+
+                // Valore
+                const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                valueText.setAttribute('x', box.x + 25);
+                valueText.setAttribute('y', box.y - 2);
+                valueText.setAttribute('text-anchor', 'middle');
+                valueText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                valueText.setAttribute('font-size', '18');
+                valueText.setAttribute('font-weight', 'bold');
+                valueText.setAttribute('fill', darkBlue);
+                valueText.textContent = formatNumber(box.value);
+                svg.appendChild(valueText);
+
+                // Etichetta
+                const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                labelText.setAttribute('x', box.x + 25);
+                labelText.setAttribute('y', box.y + 15);
+                labelText.setAttribute('text-anchor', 'middle');
+                labelText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                labelText.setAttribute('font-size', '10');
+                labelText.setAttribute('fill', gray);
+                labelText.textContent = box.label;
+                svg.appendChild(labelText);
+            });
+        }
+
+        function updateStatistics(analysisData, topic, kpi) {
+            const totalPosts = analysisData.reduce((sum, d) => sum + d.totalPosts, 0);
+            const topicPostsCount = analysisData.reduce((sum, d) => sum + d.topicPosts, 0);
+            const avgAll = analysisData.reduce((sum, d) => sum + d.avgAll, 0) / analysisData.length;
+            const topicData = analysisData.filter(d => d.avgTopic !== null);
+            const avgTopic = topicData.length > 0 ? 
+                topicData.reduce((sum, d) => sum + d.avgTopic, 0) / topicData.length : 0;
+
+            document.getElementById('totalPosts').textContent = formatNumber(totalPosts);
+            document.getElementById('topicPosts').textContent = formatNumber(topicPostsCount);
+            document.getElementById('avgOverall').textContent = formatNumber(avgAll);
+            document.getElementById('avgTopic').textContent = formatNumber(avgTopic);
+        }
+
+        function downloadSVG(type) {
+            const svgElement = type === 'chart' ? 
+                document.getElementById('chartPreview') : 
+                document.getElementById('statsPreview');
+            
+            const svgContent = new XMLSerializer().serializeToString(svgElement);
+            const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = type === 'chart' ? 
+                'grafico_benchmark.svg' : 
+                'riepilogo_statistiche.svg';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            const button = type === 'chart' ? 
+                document.getElementById('downloadChart') : 
+                document.getElementById('downloadStats');
+            
+            const originalText = button.innerHTML;
+            updateButtonState(button, 'success', originalText);
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Social Analytics Dashboard inizializzato');
         });
     </script>
-
 </body>
 </html>
