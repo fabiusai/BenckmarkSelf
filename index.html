@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Analytics Dashboard</title>
+    <link rel="icon" href="favicon.ico">
+
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Libraries for Excel parsing and chart generation -->
+    <script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" 
+        xintegrity="sha512-r22gChDnGvBylk90+2e/ycr3RVr/me8z+YoSSIiZxjQsMVLAGz6M_2dEOfYogIIFeyA9Ok6NsfG5VOBaT-RkJA==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" 
+        xintegrity="sha512-WuRa+KfdHCSinWBIxJAq6oT1eT5C/uXw3RjWpNaeFdGv/rL4zpY39B/pNyI7yB3eI/3rGjIeNqjB34L/NlI1PA==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- The date-fns library will be embedded in the main script tag below -->
+
+    <style>
+        /* Custom styles to match the requested branding */
+        @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap');
+
+        body {
+            font-family: "Avenir Next LT Pro", "Nunito Sans", sans-serif;
+            background-color: #f0f1f5;
+            color: #3b3b3a;
+        }
+
+        /* Brand Colors Configuration for Tailwind */
+        .bg-brand-yellow { background-color: #ffc72c; }
+        .bg-brand-blue { background-color: #0a4bb8; }
+        .text-brand-blue { color: #0a4bb8; }
+        .border-brand-blue { border-color: #0a4bb8; }
+        .hover\:bg-brand-blue-dark:hover { background-color: #083c93; }
+
+        .btn {
+            @apply inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-bold rounded-md shadow-sm text-white bg-brand-blue hover:bg-brand-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue transition-colors duration-200;
+        }
+
+        .btn-secondary {
+            @apply bg-gray-600 hover:bg-gray-700 focus:ring-gray-500;
+        }
+
+        .card {
+            @apply bg-white rounded-xl shadow-md p-6;
+        }
+
+        /* Custom styles for form elements */
+        .form-select, .form-input {
+            @apply block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-blue focus:border-brand-blue sm:text-sm rounded-md;
+        }
+        
+        /* Spinner for loading states */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0a4bb8;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Chart-specific styles */
+        .chart-container .bar {
+            fill: #bfd7fd; /* celeste */
+            transition: opacity 0.2s;
+        }
+         .chart-container .bar:hover {
+            opacity: 0.8;
+        }
+        .chart-container .marker {
+            fill: #0a4bb8; /* blu */
+            stroke: white;
+            stroke-width: 2px;
+        }
+        .chart-container .marker-label {
+            font-size: 11px;
+            font-weight: 700;
+            fill: #0a4bb8; /* blu */
+            text-anchor: middle;
+        }
+        .chart-container .axis-label {
+            font-size: 12px;
+            fill: #3b3b3a; /* grigio */
+        }
+        .chart-container .axis path,
+        .chart-container .axis line {
+            stroke: #d1d5db;
+        }
+        .chart-container .axis .tick text {
+            fill: #3b3b3a; /* grigio */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app-container" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-brand-yellow py-4 shadow-md">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="text-3xl font-extrabold text-brand-blue tracking-tight">Dashboard di Analisi Social</h1>
+                <p class="text-brand-blue opacity-90 mt-1">Genera benchmark di performance per i tuoi contenuti</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+            <!-- Step 1: File Upload -->
+            <div id="upload-section" class="card">
+                <div class="flex items-center space-x-4">
+                     <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 15l5-5m0 0l-5-5m5 5H7" /></svg>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-brand-blue">1. Carica il tuo file Excel</h2>
+                        <p class="text-gray-600">Seleziona il file contenente i dati di engagement dei post.</p>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <input type="file" id="excel-file" class="hidden" accept=".xlsx, .xls, .csv">
+                    <button id="upload-button" class="btn w-full sm:w-auto">
+                        <span id="upload-button-text">Seleziona File</span>
+                    </button>
+                    <p id="file-name" class="mt-3 text-sm text-gray-500"></p>
+                </div>
+                 <div id="loading-spinner" class="hidden mt-4 flex items-center space-x-2">
+                    <div class="loader"></div>
+                    <p class="text-gray-600">Elaborazione del file in corso...</p>
+                </div>
+                 <div id="error-message" class="hidden mt-4 text-red-600 font-semibold"></div>
+            </div>
+
+            <!-- Analysis Section (hidden by default) -->
+            <div id="analysis-section" class="hidden mt-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Left Column: Filters -->
+                    <div class="lg:col-span-1 space-y-8">
+                        <div class="card">
+                             <div class="flex items-center space-x-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1v-6a1 1 0 00-1-1h-6z" /></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-brand-blue">2. Imposta i Filtri</h2>
+                                    <p class="text-gray-600">Definisci i parametri per l'analisi.</p>
+                                </div>
+                            </div>
+                            <div class="mt-6 space-y-6">
+                                <!-- Argomento -->
+                                <div>
+                                    <label for="argomento-filter" class="block text-sm font-bold text-gray-700">Argomento</label>
+                                    <input type="text" id="argomento-search" placeholder="Filtra argomenti..." class="form-input mt-1">
+                                    <select id="argomento-filter" class="form-select mt-2"></select>
+                                </div>
+                                <!-- KPI -->
+                                <div>
+                                    <label for="kpi-filter" class="block text-sm font-bold text-gray-700">KPI da esaminare</label>
+                                    <select id="kpi-filter" class="form-select mt-1">
+                                        <option value="Visualizzazioni">Visualizzazioni</option>
+                                        <option value="Interazioni">Interazioni</option>
+                                        <option value="Commenti">Commenti</option>
+                                        <option value="Like e reazioni">Like e reazioni</option>
+                                        <option value="Condivisioni">Condivisioni</option>
+                                    </select>
+                                </div>
+                                <!-- Canale -->
+                                <div>
+                                    <label for="canale-filter" class="block text-sm font-bold text-gray-700">Canale</label>
+                                    <select id="canale-filter" class="form-select mt-1"></select>
+                                </div>
+                                <!-- Time Range -->
+                                <div>
+                                    <label for="time-range-filter" class="block text-sm font-bold text-gray-700">Raggruppamento temporale</label>
+                                    <select id="time-range-filter" class="form-select mt-1">
+                                        <option value="day">Giorno</option>
+                                        <option value="week">Settimana</option>
+                                        <option value="15days">15 giorni</option>
+                                        <option value="month" selected>Mese</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Results -->
+                    <div class="lg:col-span-2 space-y-8">
+                        
+                        <!-- Summary Info -->
+                        <div class="card">
+                             <div class="flex items-center space-x-4 mb-6">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-brand-blue">3. Informazioni Sintetiche</h2>
+                                    <p class="text-gray-600">Riepilogo dei dati in base ai filtri selezionati.</p>
+                                </div>
+                            </div>
+                            <div id="summary-content-wrapper">
+                                <!-- SVG for summary will be generated here -->
+                            </div>
+                            <button id="download-summary-button" class="btn mt-6 w-full sm:w-auto">
+                                <span id="download-summary-text">Download Riepilogo (SVG)</span>
+                            </button>
+                        </div>
+
+                        <!-- Main Chart -->
+                        <div class="card">
+                            <div class="flex items-center space-x-4 mb-6">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-brand-blue text-white flex items-center justify-center">
+                                   <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-brand-blue">4. Grafico di Benchmark</h2>
+                                    <p class="text-gray-600">Confronto tra la media complessiva e l'argomento selezionato.</p>
+                                </div>
+                            </div>
+                            <div id="chart-container" class="chart-container overflow-x-auto">
+                                <!-- Main chart SVG will be rendered here -->
+                            </div>
+                             <button id="download-chart-button" class="btn mt-6 w-full sm:w-auto">
+                                <span id="download-chart-text">Download Grafico (SVG)</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- NEW: Embedded date-fns library ---
+            const dateFns = {
+                _toInteger: function(e){
+                    if(null===e||!0===e||!1===e)return NaN;
+                    var t=Number(e);
+                    return isNaN(t)?t:t<0?Math.ceil(t):Math.floor(t)
+                },
+                
+                toDate: function(e){
+                    var t=this;
+                    if(arguments.length<1)throw new TypeError("1 argument required, but only "+arguments.length+" present");
+                    var r=Object.prototype.toString.call(e);
+                    if(e instanceof Date||"object"==typeof e&&"[object Date]"===r)return new Date(e.getTime());
+                    if("number"==typeof e||"[object Number]"===r)return new Date(e);
+                    if(!("string"==typeof e||"[object String]"===r))return new Date(NaN);
+                    const n = String(e).split('/');
+                    if (n.length === 3 && n[2].length === 4) {
+                       // Assuming DD/MM/YYYY
+                       return new Date(n[2], n[1] - 1, n[0]);
+                    }
+                    return new Date(e); // Fallback for other string formats
+                },
+
+                startOfDay: function(e){
+                    var t=this.toDate(e);
+                    t.setHours(0,0,0,0);
+                    return t
+                },
+
+                startOfMonth: function(e){
+                    var t=this.toDate(e);
+                    t.setDate(1);
+                    t.setHours(0,0,0,0);
+                    return t
+                },
+
+                startOfWeek: function(e,t){
+                    var r=t&&t.weekStartsOn?this._toInteger(t.weekStartsOn):0;
+                    var n=this.toDate(e);
+                    var o=n.getDay();
+                    var a=(o<r?7:0)+o-r;
+                    n.setDate(n.getDate()-a);
+                    n.setHours(0,0,0,0);
+                    return n
+                },
+
+                addDays: function(e,t){
+                    var r=this.toDate(e);
+                    var n=this._toInteger(t);
+                    r.setDate(r.getDate()+n);
+                    return r
+                },
+                
+                differenceInDays: function(e,t){
+                    var r=this.toDate(e);
+                    var n=this.toDate(t);
+                    var o=r.getTime()-r.getTimezoneOffset()*6e4;
+                    var a=n.getTime()-n.getTimezoneOffset()*6e4;
+                    return Math.round((o-a)/864e5)
+                },
+
+                format: function(date, formatStr) {
+                    const d = this.toDate(date);
+                    if (isNaN(d)) return "Invalid Date";
+                    const year = d.getFullYear();
+                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const monthNames = ["Gen", "Feb", "Mar", "Apr", "Mag", "Giu", "Lug", "Ago", "Set", "Ott", "Nov", "Dic"];
+                    
+                    let result = formatStr;
+                    result = result.replace(/yyyy/g, year);
+                    result = result.replace(/yy/g, String(year).slice(-2));
+                    result = result.replace(/MMM/g, monthNames[d.getMonth()]);
+                    result = result.replace(/MM/g, month);
+                    result = result.replace(/dd/g, day);
+                    return result;
+                }
+            };
+
+            // --- Library loading check (should always pass now) ---
+            if (typeof XLSX === 'undefined' || typeof d3 === 'undefined') {
+                console.error("A critical library (XLSX or D3) failed to load.");
+                document.getElementById('app-container').innerHTML = `<div class="p-8 text-center text-red-700">Errore critico: una libreria essenziale non è stata caricata. L'applicazione non può funzionare. Controlla la tua connessione a internet o eventuali blocchi di rete.</div>`;
+                return; 
+            }
+
+            // --- DOM ELEMENTS ---
+            const uploadButton = document.getElementById('upload-button');
+            const uploadButtonText = document.getElementById('upload-button-text');
+            const fileInput = document.getElementById('excel-file');
+            const fileNameDisplay = document.getElementById('file-name');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const errorMessage = document.getElementById('error-message');
+            const analysisSection = document.getElementById('analysis-section');
+            const argomentoSearch = document.getElementById('argomento-search');
+            const argomentoFilter = document.getElementById('argomento-filter');
+            const kpiFilter = document.getElementById('kpi-filter');
+            const canaleFilter = document.getElementById('canale-filter');
+            const timeRangeFilter = document.getElementById('time-range-filter');
+            const summaryWrapper = document.getElementById('summary-content-wrapper');
+            const chartContainer = document.getElementById('chart-container');
+            const downloadSummaryButton = document.getElementById('download-summary-button');
+            const downloadChartButton = document.getElementById('download-chart-button');
+            
+            // --- STATE ---
+            let rawData = [];
+            let argomentoOptions = [];
+            const kpiMapping = {
+                'Visualizzazioni': 'Visualizzazioni',
+                'Interazioni': 'Interazioni',
+                'Commenti': 'Commenti',
+                'Like e reazioni': 'Like e reazioni',
+                'Condivisioni': 'Condivisioni'
+            };
+
+            // --- EVENT LISTENERS ---
+            uploadButton.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFile);
+            [argomentoFilter, kpiFilter, canaleFilter, timeRangeFilter].forEach(el => {
+                el.addEventListener('change', updateVisualizations);
+            });
+            argomentoSearch.addEventListener('input', filterArgomentoDropdown);
+            downloadSummaryButton.addEventListener('click', () => handleDownload('summary'));
+            downloadChartButton.addEventListener('click', () => handleDownload('chart'));
+
+
+            // --- FUNCTIONS ---
+
+            /**
+             * Handles the file upload process.
+             * @param {Event} event - The file input change event.
+             */
+            function handleFile(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                fileNameDisplay.textContent = `File selezionato: ${file.name}`;
+                loadingSpinner.style.display = 'flex';
+                errorMessage.style.display = 'none';
+                analysisSection.style.display = 'none';
+                uploadButtonText.textContent = 'Caricamento...';
+                uploadButton.disabled = true;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheetName = 'Raccolta dati';
+                        if (!workbook.SheetNames.includes(sheetName)) {
+                           throw new Error(`Il file Excel deve contenere un foglio chiamato "${sheetName}".`);
+                        }
+                        const worksheet = workbook.Sheets[sheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                        processData(jsonData);
+                        
+                        analysisSection.style.display = 'block';
+                        updateVisualizations();
+
+                    } catch (error) {
+                        console.error('Error processing file:', error);
+                        errorMessage.textContent = `Errore: ${error.message}`;
+                        errorMessage.style.display = 'block';
+                    } finally {
+                        loadingSpinner.style.display = 'none';
+                        uploadButtonText.textContent = 'Seleziona un altro file';
+                        uploadButton.disabled = false;
+                        fileInput.value = ''; // Reset file input
+                    }
+                };
+                reader.onerror = () => {
+                     errorMessage.textContent = 'Errore nella lettura del file.';
+                     errorMessage.style.display = 'block';
+                     loadingSpinner.style.display = 'none';
+                     uploadButtonText.textContent = 'Riprova';
+                     uploadButton.disabled = false;
+                };
+                reader.readAsArrayBuffer(file);
+            }
+
+            /**
+             * Processes and cleans the raw JSON data from the Excel file.
+             * @param {Array<Object>} jsonData - Data from the Excel sheet.
+             */
+            function processData(jsonData) {
+                // Filter for 'Editoriale' campaign and posts with a valid date
+                rawData = jsonData
+                    .filter(row => row['Campagna'] === 'Editoriale' && row['Data'])
+                    .map(row => {
+                        const kpiKeys = Object.values(kpiMapping);
+                        const newRow = { ...row };
+                        
+                        // Convert KPI columns to numbers, defaulting to 0 if invalid
+                        kpiKeys.forEach(kpi => {
+                            newRow[kpi] = Number(row[kpi]) || 0;
+                        });
+
+                        // Parse date using the embedded dateFns function
+                        newRow.date = dateFns.toDate(row['Data']);
+                        if (typeof row['Data'] === 'number') { // Handle Excel date serial number
+                           newRow.date = new Date(Math.round((row['Data'] - 25569) * 86400 * 1000));
+                        }
+                        
+                        return newRow;
+                    })
+                    .filter(row => row.date instanceof Date && !isNaN(row.date)); // Final check for valid dates
+                
+                if (rawData.length === 0) {
+                   throw new Error("Nessun dato 'Editoriale' valido trovato nel file. Controlla le colonne 'Campagna' e 'Data'.");
+                }
+
+                populateFilters();
+            }
+
+            /**
+             * Populates the 'Argomento' and 'Canale' dropdowns based on loaded data.
+             */
+            function populateFilters() {
+                const argomenti = [...new Set(rawData.map(d => d['Argomento']).filter(Boolean))].sort();
+                const canali = [...new Set(rawData.map(d => d['Canale']).filter(Boolean))].sort();
+
+                argomentoOptions = argomenti.map(arg => `<option value="${arg}">${arg}</option>`);
+                argomentoFilter.innerHTML = argomentoOptions.join('');
+
+                canaleFilter.innerHTML = '<option value="all">Tutti i canali</option>' + 
+                    canali.map(c => `<option value="${c}">${c}</option>`).join('');
+            }
+            
+            /**
+             * Filters the Argomento dropdown based on text input.
+             */
+            function filterArgomentoDropdown() {
+                const searchTerm = argomentoSearch.value.toLowerCase();
+                const filteredOptions = argomentoOptions.filter(opt => opt.toLowerCase().includes(searchTerm));
+                argomentoFilter.innerHTML = filteredOptions.join('');
+            }
+
+            /**
+             * Main function to trigger updates to all visualizations.
+             */
+            function updateVisualizations() {
+                if (rawData.length === 0) return;
+
+                const filters = {
+                    argomento: argomentoFilter.value,
+                    kpi: kpiFilter.value,
+                    canale: canaleFilter.value,
+                    timeRange: timeRangeFilter.value
+                };
+                
+                // 1. Filter data based on channel
+                const channelFilteredData = (filters.canale === 'all')
+                    ? rawData
+                    : rawData.filter(d => d['Canale'] === filters.canale);
+
+                if (channelFilteredData.length === 0) {
+                    showNoDataMessage();
+                    return;
+                }
+
+                // 2. Generate data for chart
+                const chartData = generateChartData(channelFilteredData, filters);
+                
+                // 3. Update summary
+                updateSummary(channelFilteredData, filters);
+                
+                // 4. Draw chart
+                drawChart(chartData, filters.kpi);
+            }
+
+            function showNoDataMessage() {
+                summaryWrapper.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun post trovato per i filtri selezionati.</div>`;
+                chartContainer.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun dato da visualizzare nel grafico.</div>`;
+            }
+
+            /**
+             * Generates the structured data required for the D3 chart.
+             * @param {Array<Object>} data - The pre-filtered data.
+             * @param {Object} filters - Current filter values.
+             * @returns {Array<Object>} - Data ready for charting.
+             */
+            function generateChartData(data, filters) {
+                const kpi = kpiMapping[filters.kpi];
+                const getPeriodStart = (date) => {
+                    switch (filters.timeRange) {
+                        case 'day': return dateFns.startOfDay(date);
+                        case 'week': return dateFns.startOfWeek(date, { weekStartsOn: 1 });
+                        case '15days':
+                            const minDate = d3.min(data, d => d.date);
+                            const diff = dateFns.differenceInDays(date, minDate);
+                            const periodIndex = Math.floor(diff / 15);
+                            return dateFns.addDays(minDate, periodIndex * 15);
+                        case 'month': return dateFns.startOfMonth(date);
+                        default: return date;
+                    }
+                };
+
+                const grouped = d3.group(data, d => getPeriodStart(d.date).getTime());
+
+                const chartData = Array.from(grouped, ([timestamp, values]) => {
+                    const topicValues = values.filter(d => d['Argomento'] === filters.argomento);
+                    
+                    return {
+                        date: new Date(timestamp),
+                        overallAvg: d3.mean(values, v => v[kpi]),
+                        topicAvg: topicValues.length > 0 ? d3.mean(topicValues, v => v[kpi]) : null
+                    };
+                });
+                
+                return chartData.sort((a, b) => a.date - b.date);
+            }
+            
+             /**
+             * Formats a number into a compact string (e.g., 1.2K, 3.4M).
+             * @param {number} num - The number to format.
+             * @returns {string} - The formatted string.
+             */
+            function formatNumber(num) {
+                if (num === null || isNaN(num)) return 'N/A';
+                if (num === 0) return '0';
+                const absNum = Math.abs(num);
+                if (absNum >= 1e6) return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+                if (absNum >= 1e3) return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+                return num.toFixed(0);
+            }
+
+            /**
+             * Updates the summary information box.
+             * @param {Array<Object>} data - Pre-filtered data.
+             * @param {Object} filters - Current filter values.
+             */
+            function updateSummary(data, filters) {
+                const kpi = kpiMapping[filters.kpi];
+                const topicData = data.filter(d => d['Argomento'] === filters.argomento);
+
+                const summary = {
+                    totalPosts: data.length,
+                    topicPosts: topicData.length,
+                    overallAvg: d3.mean(data, d => d[kpi]),
+                    topicAvg: d3.mean(topicData, d => d[kpi])
+                };
+                
+                const summarySVG = createSummarySVG(summary, filters.kpi);
+                summaryWrapper.innerHTML = '';
+                summaryWrapper.appendChild(summarySVG);
+            }
+
+            /**
+             * Creates an SVG element for the summary info.
+             */
+            function createSummarySVG(summary, kpiName) {
+                const svg = d3.create("svg")
+                    .attr("viewBox", "0 0 500 150")
+                    .attr("id", "summary-svg")
+                    .style("font-family", '"Avenir Next LT Pro", "Nunito Sans", sans-serif')
+                    .style("background-color", "#ffffff");
+
+                const data = [
+                    { label: "Totale post pubblicati", value: formatNumber(summary.totalPosts) },
+                    { label: `Post sull'argomento`, value: formatNumber(summary.topicPosts) },
+                    { label: `Media complessiva ${kpiName}`, value: formatNumber(summary.overallAvg) },
+                    { label: `Media argomento ${kpiName}`, value: formatNumber(summary.topicAvg) }
+                ];
+
+                const items = svg.selectAll("g.summary-item")
+                    .data(data)
+                    .join("g")
+                    .attr("class", "summary-item")
+                    .attr("transform", (d, i) => `translate(${i % 2 === 0 ? 30 : 270}, ${i < 2 ? 40 : 100})`);
+
+                items.append("text")
+                    .text(d => d.value)
+                    .attr("font-size", "28px")
+                    .attr("font-weight", "800")
+                    .attr("fill", "#0a4bb8"); // blu
+
+                items.append("text")
+                    .text(d => d.label)
+                    .attr("y", 20)
+                    .attr("font-size", "14px")
+                    .attr("fill", "#3b3b3a"); // grigio
+
+                return svg.node();
+            }
+
+            /**
+             * Draws the main D3 bar chart.
+             * @param {Array<Object>} data - Chart-ready data.
+             * @param {string} kpiName - The name of the KPI being displayed.
+             */
+            function drawChart(data, kpiName) {
+                chartContainer.innerHTML = ''; // Clear previous chart
+                if (data.length === 0) {
+                   chartContainer.innerHTML = `<div class="text-center p-4 bg-yellow-50 text-yellow-800 rounded-lg">Nessun dato da visualizzare per il periodo selezionato.</div>`;
+                   return;
+                }
+                
+                const width = 1200;
+                const height = 275;
+                const margin = { top: 40, right: 20, bottom: 50, left: 60 };
+
+                const svg = d3.create("svg")
+                    .attr("viewBox", `0 0 ${width} ${height}`)
+                    .attr("id", "main-chart-svg")
+                    .style("max-width", "100%")
+                    .style("height", "auto");
+
+                const x = d3.scaleBand()
+                    .domain(data.map(d => d.date))
+                    .range([margin.left, width - margin.right])
+                    .padding(0.3);
+
+                const y = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => Math.max(d.overallAvg, d.topicAvg || 0))]).nice()
+                    .range([height - margin.bottom, margin.top]);
+
+                // X-Axis
+                const xAxis = g => g
+                    .attr("transform", `translate(0,${height - margin.bottom})`)
+                    .call(d3.axisBottom(x).tickFormat(d => {
+                        const timeRange = timeRangeFilter.value;
+                        if (timeRange === 'day') return dateFns.format(d, 'dd/MM');
+                        if (timeRange === 'week' || timeRange === '15days') return dateFns.format(d, 'dd/MM/yy');
+                        return dateFns.format(d, 'MMM yy');
+                    }).tickSizeOuter(0));
+                
+                // Y-Axis
+                const yAxis = g => g
+                    .attr("transform", `translate(${margin.left},0)`)
+                    .call(d3.axisLeft(y).ticks(5).tickFormat(d => formatNumber(d)))
+                    .call(g => g.select(".domain").remove()) // Remove axis line
+                    .call(g => g.selectAll(".tick line").clone() // Add grid lines
+                        .attr("x2", width - margin.left - margin.right)
+                        .attr("stroke-opacity", 0.1));
+
+                svg.append("g").call(xAxis).attr("class", "axis");
+                svg.append("g").call(yAxis).attr("class", "axis");
+                
+                // Y-Axis Label
+                svg.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x", -margin.left)
+                    .attr("y", 15)
+                    .attr("dy", "0.32em")
+                    .attr("fill", "currentColor")
+                    .attr("font-weight", "bold")
+                    .text(kpiName);
+
+                // Bars
+                svg.append("g")
+                    .selectAll("rect")
+                    .data(data)
+                    .join("rect")
+                    .attr("class", "bar")
+                    .attr("x", d => x(d.date))
+                    .attr("y", d => y(d.overallAvg))
+                    .attr("height", d => y(0) - y(d.overallAvg))
+                    .attr("width", x.bandwidth());
+
+                const markerGroup = svg.append("g")
+                    .selectAll("g")
+                    .data(data.filter(d => d.topicAvg !== null && d.topicAvg >= 0))
+                    .join("g");
+
+                // Markers
+                markerGroup.append("circle")
+                    .attr("class", "marker")
+                    .attr("cx", d => x(d.date) + x.bandwidth() / 2)
+                    .attr("cy", d => y(d.topicAvg))
+                    .attr("r", 5);
+                
+                // Marker Labels
+                markerGroup.append("text")
+                    .attr("class", "marker-label")
+                    .attr("x", d => x(d.date) + x.bandwidth() / 2)
+                    .attr("y", d => y(d.topicAvg) - 10)
+                    .text(d => formatNumber(d.topicAvg));
+
+                chartContainer.appendChild(svg.node());
+            }
+
+            /**
+             * Handles downloading the specified SVG element.
+             * @param {string} type - 'summary' or 'chart'.
+             */
+            function handleDownload(type) {
+                const button = (type === 'summary') ? downloadSummaryButton : downloadChartButton;
+                const buttonText = button.querySelector('span');
+                const originalText = buttonText.textContent;
+
+                buttonText.textContent = 'Preparazione...';
+                button.disabled = true;
+
+                setTimeout(() => { // Timeout to allow UI to update
+                    const svgNode = document.getElementById(type === 'summary' ? 'summary-svg' : 'main-chart-svg');
+                    if (!svgNode) {
+                        console.error('SVG node not found for download');
+                        buttonText.textContent = 'Errore';
+                        setTimeout(() => {
+                           buttonText.textContent = originalText;
+                           button.disabled = false;
+                        }, 2000);
+                        return;
+                    }
+                    
+                    const filename = type === 'summary' ? 'riepilogo_dati.svg' : 'grafico_benchmark.svg';
+                    
+                    // Clone the SVG to avoid modifying the displayed one
+                    const svgClone = svgNode.cloneNode(true);
+                    
+                    // Add an explicit font-family style to the clone for better compatibility
+                    svgClone.style.fontFamily = '"Avenir Next LT Pro", "Nunito Sans", sans-serif';
+
+                    const serializer = new XMLSerializer();
+                    let source = serializer.serializeToString(svgClone);
+
+                    // Add XML namespace
+                    if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+                        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+                    }
+                    
+                    const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    buttonText.textContent = 'Fatto!';
+                    setTimeout(() => {
+                        buttonText.textContent = originalText;
+                        button.disabled = false;
+                    }, 2000);
+
+                }, 100);
+            }
+        });
+    </script>
+
+</body>
+</html>
