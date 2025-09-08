@@ -298,204 +298,200 @@
             <p>Analizza le performance dei tuoi contenuti social con grafici professionali</p>
         </div>
 
-        <!-- Sezione 1: Caricamento File -->
+        <!-- Sezione upload file -->
         <div class="section">
             <h2>
                 <svg class="icon" viewBox="0 0 24 24">
-                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                 </svg>
-                1. Caricamento File Excel
+                Carica i tuoi dati Excel
             </h2>
             <div class="form-group">
-                <label for="fileInput">Seleziona il file Excel con i dati di engagement:</label>
+                <label for="fileInput">Seleziona il file Excel con i dati dei social media</label>
                 <input type="file" id="fileInput" accept=".xlsx,.xls" />
             </div>
             <div id="fileStatus" class="loading">
                 <div class="spinner"></div>
-                <span>Caricamento in corso...</span>
+                Caricamento e analisi del file in corso...
             </div>
         </div>
 
-        <!-- Sezioni di configurazione (nascoste inizialmente) -->
+        <!-- Sezione configurazione -->
         <div id="configSections" class="hidden">
-            <!-- Sezione 2: Selezione Argomento -->
             <div class="section">
                 <h2>
                     <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4M12,6A6,6 0 0,0 6,12A6,6 0 0,0 12,18A6,6 0 0,0 18,12A6,6 0 0,0 12,6M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8Z"/>
+                        <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.03L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.03C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" />
                     </svg>
-                    2. Selezione Argomento
+                    Configurazione Analisi
                 </h2>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="topicSelect">Argomento:</label>
+                        <label for="topicFilter">Filtra argomenti</label>
+                        <div class="search-container">
+                            <input type="text" id="topicFilter" placeholder="Digita per filtrare..." />
+                            <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20">
+                                <path d="M15.5 14h-.79l-.28-.27A6.518 6.518 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5.5 12.49 5.5 11S7.01 8 9.5 8 13.5 9.51 13.5 11 11.99 14 9.5 14z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="topicSelect">Argomento da analizzare</label>
                         <select id="topicSelect">
                             <option value="">Seleziona un argomento...</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="topicFilter">Filtra argomenti:</label>
-                        <div class="search-container">
-                            <input type="text" id="topicFilter" placeholder="Cerca argomento...">
-                            <svg class="search-icon icon" viewBox="0 0 24 24">
-                                <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z"/>
-                            </svg>
-                        </div>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Sezione 3: Selezione KPI e Canale -->
-            <div class="section">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M22,21H2V3H4V19H6V10H10V19H12V6H16V19H18V14H22V21Z"/>
-                    </svg>
-                    3. Configurazione Analisi
-                </h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="kpiSelect">KPI da analizzare:</label>
+                        <label for="kpiSelect">Metrica da analizzare</label>
                         <select id="kpiSelect">
-                            <option value="Visualizzazioni">Visualizzazioni</option>
                             <option value="Interazioni">Interazioni</option>
-                            <option value="Commenti">Commenti</option>
+                            <option value="Visualizzazioni">Visualizzazioni</option>
+                            <option value="Persone raggiunte">Persone raggiunte</option>
+                            <option value="Click">Click</option>
                             <option value="Like e reazioni">Like e reazioni</option>
                             <option value="Condivisioni">Condivisioni</option>
+                            <option value="Commenti">Commenti</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="channelSelect">Canale:</label>
+                        <label for="channelSelect">Canale</label>
                         <select id="channelSelect">
                             <option value="tutti">Tutti i canali</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-row">
                     <div class="form-group">
-                        <label for="periodSelect">Raggruppamento temporale:</label>
+                        <label for="periodSelect">Raggruppamento temporale</label>
                         <select id="periodSelect">
-                            <option value="day">Giorno</option>
-                            <option value="week">Settimana</option>
-                            <option value="15days">15 giorni</option>
-                            <option value="month">Mese</option>
+                            <option value="day">Giornaliero</option>
+                            <option value="week">Settimanale</option>
+                            <option value="15days">Quindicinale</option>
+                            <option value="month" selected>Mensile</option>
                         </select>
                     </div>
                 </div>
-                <div class="form-group">
-                    <button id="generateBtn" class="btn">
+
+                <button id="generateBtn" class="btn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3,3H11V7H7V11H3V3M13,3H21V7H17V11H13V3M3,13H11V17H7V21H3V13M13,13H21V17H17V21H13V13Z" />
+                    </svg>
+                    Genera Analisi Benchmark
+                </button>
+            </div>
+        </div>
+
+        <!-- Sezione risultati -->
+        <div id="resultsSection" class="hidden">
+            <div class="section">
+                <h2>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M3,3V21H21V19H5V3H3M7,17H9V10H7V17M11,17H13V6H11V17M15,17H17V12H15V17M19,17H21V8H19V17Z" />
+                    </svg>
+                    Risultati dell'Analisi
+                </h2>
+
+                <!-- Statistiche numeriche -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div id="totalPosts" class="stat-value">-</div>
+                        <div class="stat-label">Post Totali</div>
+                    </div>
+                    <div class="stat-card">
+                        <div id="topicPosts" class="stat-value">-</div>
+                        <div class="stat-label">Post Argomento</div>
+                    </div>
+                    <div class="stat-card">
+                        <div id="avgOverall" class="stat-value">-</div>
+                        <div class="stat-label">Media Generale</div>
+                    </div>
+                    <div class="stat-card">
+                        <div id="avgTopic" class="stat-value">-</div>
+                        <div class="stat-label">Media Argomento</div>
+                    </div>
+                </div>
+
+                <!-- Grafico benchmark -->
+                <div class="chart-container">
+                    <h3>Grafico Benchmark</h3>
+                    <svg id="chartPreview" width="100%" height="300" style="border: 2px solid #e9ecef; border-radius: 8px;">
+                        <text x="50%" y="50%" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#666">
+                            Genera un'analisi per visualizzare il grafico
+                        </text>
+                    </svg>
+                </div>
+
+                <!-- Riepilogo statistiche -->
+                <div class="chart-container">
+                    <h3>Riepilogo Statistiche</h3>
+                    <svg id="statsPreview" width="100%" height="200" style="border: 2px solid #e9ecef; border-radius: 8px;">
+                        <text x="50%" y="50%" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#666">
+                            Genera un'analisi per visualizzare le statistiche
+                        </text>
+                    </svg>
+                </div>
+
+                <!-- Sezione download -->
+                <div class="download-section">
+                    <button id="downloadChart" class="btn btn-secondary" onclick="downloadSVG('chart')">
                         <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M5,3C3.89,3 3,3.89 3,5V19C3,20.11 3.89,21 5,21H19C20.11,21 21,20.11 21,19V5C21,3.89 20.11,3 19,3H5M5,5H19V19H5V5M7,7V9H17V7H7M7,11V13H17V11H7M7,15V17H14V15H7Z"/>
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
                         </svg>
-                        Genera Analisi
+                        Scarica Grafico SVG
+                    </button>
+                    <button id="downloadStats" class="btn btn-secondary" onclick="downloadSVG('stats')">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                        </svg>
+                        Scarica Statistiche SVG
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Sezione Risultati (nascosta inizialmente) -->
-        <div id="resultsSection" class="hidden">
-            <!-- Sezione 6: Informazioni Sintetiche -->
-            <div class="section">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M13,9H11V7H13M13,17H11V11H13M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/>
-                    </svg>
-                    Informazioni Sintetiche
-                </h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-value" id="totalPosts">0</div>
-                        <div class="stat-label">Totale post pubblicati</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="topicPosts">0</div>
-                        <div class="stat-label">Post sull'argomento selezionato</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="avgOverall">0</div>
-                        <div class="stat-label">Media complessiva KPI</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="avgTopic">0</div>
-                        <div class="stat-label">Media KPI argomento</div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <svg id="statsPreview" width="100%" height="250"></svg>
-                    <div class="download-section">
-                        <button id="downloadStats" class="btn btn-secondary">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                            </svg>
-                            Scarica Riepilogo SVG
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sezione 7: Grafico Principale -->
-            <div class="section">
-                <h2>
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M22,21H2V3H4V19H6V17H10V19H12V16H16V19H18V17H22V21Z"/>
-                    </svg>
-                    Grafico di Benchmark
-                </h2>
-                <div class="chart-container">
-                    <svg id="chartPreview" width="100%" height="350"></svg>
-                    <div class="download-section">
-                        <button id="downloadChart" class="btn btn-secondary">
-                            <svg class="icon" viewBox="0 0 24 24">
-                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                            </svg>
-                            Scarica Grafico SVG
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="errorMsg" class="error hidden"></div>
-        <div id="successMsg" class="success hidden"></div>
+        <!-- Messaggio di stato -->
+        <div id="message" class="hidden"></div>
     </div>
 
+    <!-- XLSX library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+
     <script>
+        // Variabili globali
         let excelData = [];
-        let filteredData = [];
         let allTopics = [];
         let allChannels = [];
 
-        // Elementi DOM
+        // Riferimenti DOM
         const fileInput = document.getElementById('fileInput');
         const fileStatus = document.getElementById('fileStatus');
         const configSections = document.getElementById('configSections');
         const resultsSection = document.getElementById('resultsSection');
-        const topicSelect = document.getElementById('topicSelect');
         const topicFilter = document.getElementById('topicFilter');
+        const topicSelect = document.getElementById('topicSelect');
         const kpiSelect = document.getElementById('kpiSelect');
         const channelSelect = document.getElementById('channelSelect');
         const periodSelect = document.getElementById('periodSelect');
         const generateBtn = document.getElementById('generateBtn');
-        const errorMsg = document.getElementById('errorMsg');
-        const successMsg = document.getElementById('successMsg');
+        const messageDiv = document.getElementById('message');
 
-        // Event Listeners
+        // Event listeners
         fileInput.addEventListener('change', handleFileUpload);
         topicFilter.addEventListener('input', filterTopics);
         generateBtn.addEventListener('click', generateAnalysis);
-        document.getElementById('downloadChart').addEventListener('click', () => downloadSVG('chart'));
-        document.getElementById('downloadStats').addEventListener('click', () => downloadSVG('stats'));
 
         function showMessage(message, isError = false) {
-            const msgElement = isError ? errorMsg : successMsg;
-            const otherMsg = isError ? successMsg : errorMsg;
-            
-            msgElement.textContent = message;
-            msgElement.classList.remove('hidden');
-            otherMsg.classList.add('hidden');
-            
-            setTimeout(() => msgElement.classList.add('hidden'), 5000);
+            messageDiv.textContent = message;
+            messageDiv.className = isError ? 'error' : 'success';
+            messageDiv.classList.remove('hidden');
+            setTimeout(() => {
+                messageDiv.classList.add('hidden');
+            }, 5000);
         }
 
         function updateButtonState(button, state, originalText) {
@@ -677,19 +673,24 @@
                     const avgAll = calculateAverage(allPosts, kpi);
                     const avgTopic = topicPosts.length > 0 ? calculateAverage(topicPosts, kpi) : null;
                     
-                    analysisData.push({
-                        period: periodKey,
-                        avgAll: avgAll,
-                        avgTopic: avgTopic,
-                        totalPosts: allPosts.length,
-                        topicPosts: topicPosts.length
-                    });
+                    // Solo se ci sono dati validi per il periodo
+                    if (avgAll > 0 || avgTopic > 0) {
+                        analysisData.push({
+                            period: periodKey,
+                            avgAll: avgAll,
+                            avgTopic: avgTopic,
+                            totalPosts: allPosts.length,
+                            topicPosts: topicPosts.length
+                        });
+                    }
                 }
             });
 
+            console.log('Analysis data prepared:', analysisData);
             return analysisData;
         }
 
+        // FUNZIONE CORRETTA: Parsing migliorato delle date
         function groupByPeriod(data, period) {
             const grouped = {};
             
@@ -698,17 +699,40 @@
                 
                 let date;
                 try {
-                    // Prova diversi formati di data
                     if (typeof row.Data === 'number') {
-                        date = new Date((row.Data - 25569) * 86400 * 1000); // Excel date
+                        // Date Excel in formato numerico
+                        date = new Date((row.Data - 25569) * 86400 * 1000);
+                    } else if (typeof row.Data === 'string') {
+                        // Gestione del formato DD/MM/YYYY italiano
+                        if (row.Data.includes('/')) {
+                            const parts = row.Data.split('/');
+                            if (parts.length === 3) {
+                                // Formato DD/MM/YYYY -> crea Date(YYYY, MM-1, DD)
+                                const day = parseInt(parts[0]);
+                                const month = parseInt(parts[1]) - 1; // I mesi in JavaScript sono 0-based
+                                const year = parseInt(parts[2]);
+                                date = new Date(year, month, day);
+                            } else {
+                                date = new Date(row.Data);
+                            }
+                        } else {
+                            date = new Date(row.Data);
+                        }
+                    } else if (row.Data instanceof Date) {
+                        // Già un oggetto Date
+                        date = new Date(row.Data);
                     } else {
                         date = new Date(row.Data);
                     }
-                } catch {
+                } catch (error) {
+                    console.warn('Errore nel parsing della data:', row.Data, error);
                     return; // Salta righe con date non valide
                 }
                 
-                if (isNaN(date.getTime())) return;
+                if (isNaN(date.getTime())) {
+                    console.warn('Data non valida:', row.Data);
+                    return;
+                }
                 
                 let periodKey;
                 switch (period) {
@@ -746,7 +770,12 @@
         }
 
         function calculateAverage(data, kpi) {
-            const values = data.map(row => parseFloat(row[kpi]) || 0).filter(val => val > 0);
+            // Filtra solo i valori numerici validi (non null, non undefined, non NaN)
+            const values = data.map(row => {
+                const val = parseFloat(row[kpi]);
+                return isNaN(val) ? null : val;
+            }).filter(val => val !== null);
+            
             return values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
         }
 
@@ -797,96 +826,104 @@
             const svg = document.getElementById('chartPreview');
             svg.innerHTML = '';
             
-            // Dimensioni adattive
-            const containerWidth = Math.max(800, svg.clientWidth);
-            const width = containerWidth;
-            const height = 350;
-            const margin = { top: 40, right: 30, bottom: 80, left: 80 };
+            const width = 1200; // Nuova larghezza
+            const height = 300; // Nuova altezza
+            const margin = { top: 40, right: 40, bottom: 50, left: 80 }; // Più spazio a sinistra per scala Y
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
-            // Colori
-            const lightBlue = '#bfd7fd';
-            const darkBlue = '#0066cc';
-            const gray = '#3b3b3a';
-
-            // Trova i valori massimi per la scala
-            const maxValue = Math.max(...analysisData.map(d => Math.max(d.avgAll, d.avgTopic || 0)));
-            const yScale = chartHeight / (maxValue * 1.2);
-
-            // Larghezza delle barre
-            const barWidth = Math.max(20, chartWidth / analysisData.length - 10);
-            const barSpacing = chartWidth / analysisData.length;
-
-            // Crea viewBox per mantenere le proporzioni
+            // Usa viewBox per mantenere le proporzioni
             svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
-            // Sfondo
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('width', width);
-            rect.setAttribute('height', height);
-            rect.setAttribute('fill', 'white');
-            svg.appendChild(rect);
+            // Colori
+            const lightBlue = '#d6e6fe'; // Colore azzurro più chiaro
+            const darkBlue = '#0066cc';
+            const gray = '#999999'; // Colore grigio più chiaro
+            const darkGray = '#3b3b3a';
 
-            // Titolo
-            const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            title.setAttribute('x', width / 2);
-            title.setAttribute('y', 25);
-            title.setAttribute('text-anchor', 'middle');
-            title.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-            title.setAttribute('font-size', '16');
-            title.setAttribute('font-weight', 'bold');
-            title.setAttribute('fill', darkBlue);
-            title.textContent = `Benchmark ${kpi} - "${topic}" vs Media${channel !== 'tutti' ? ` (${channel})` : ''}`;
-            svg.appendChild(title);
+            // Sfondo trasparente (rimosso)
 
-            // Griglia orizzontale
-            const gridLines = 5;
-            for (let i = 0; i <= gridLines; i++) {
-                const y = margin.top + (chartHeight / gridLines) * i;
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', margin.left);
-                line.setAttribute('x2', margin.left + chartWidth);
-                line.setAttribute('y1', y);
-                line.setAttribute('y2', y);
-                line.setAttribute('stroke', '#e9ecef');
-                line.setAttribute('stroke-width', '1');
-                svg.appendChild(line);
+            // Titolo rimosso
 
-                // Etichette Y
-                const value = (maxValue * 1.2) * (gridLines - i) / gridLines;
-                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                label.setAttribute('x', margin.left - 10);
-                label.setAttribute('y', y + 5);
-                label.setAttribute('text-anchor', 'end');
-                label.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-                label.setAttribute('font-size', '12');
-                label.setAttribute('fill', gray);
-                label.textContent = formatNumber(value);
-                svg.appendChild(label);
+            if (analysisData.length === 0) return;
+
+            // Calcola le scale
+            const maxValue = Math.max(...analysisData.flatMap(d => [d.avgAll, d.avgTopic || 0]));
+            const yScale = maxValue > 0 ? chartHeight / maxValue : 1;
+
+            const barWidth = chartWidth / analysisData.length * 0.8;
+            const barSpacing = chartWidth / analysisData.length * 0.2;
+
+            // Scala Y - Aggiungi linee orizzontali e etichette
+            const numTicks = 5;
+            for (let i = 0; i <= numTicks; i++) {
+                const tickValue = (maxValue / numTicks) * i;
+                const yPos = margin.top + chartHeight - (tickValue * yScale);
+
+                // Linea orizzontale della griglia (opzionale, molto sottile)
+                if (i > 0) {
+                    const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    gridLine.setAttribute('x1', margin.left);
+                    gridLine.setAttribute('y1', yPos);
+                    gridLine.setAttribute('x2', margin.left + chartWidth);
+                    gridLine.setAttribute('y2', yPos);
+                    gridLine.setAttribute('stroke', '#f8f8f8');
+                    gridLine.setAttribute('stroke-width', '0.5');
+                    svg.appendChild(gridLine);
+                }
+
+                // Etichetta numerica grigia sull'asse Y
+                const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                yLabel.setAttribute('x', margin.left - 10);
+                yLabel.setAttribute('y', yPos + 4);
+                yLabel.setAttribute('text-anchor', 'end');
+                yLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                yLabel.setAttribute('font-size', '11');
+                yLabel.setAttribute('fill', gray);
+                yLabel.textContent = formatNumber(tickValue);
+                svg.appendChild(yLabel);
             }
 
-            // Barre e marker
+            // Asse Y
+            const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            yAxis.setAttribute('x1', margin.left);
+            yAxis.setAttribute('y1', margin.top);
+            yAxis.setAttribute('x2', margin.left);
+            yAxis.setAttribute('y2', margin.top + chartHeight);
+            yAxis.setAttribute('stroke', '#cccccc');
+            yAxis.setAttribute('stroke-width', '0.5');
+            svg.appendChild(yAxis);
+
+            // Asse X
+            const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            xAxis.setAttribute('x1', margin.left);
+            xAxis.setAttribute('y1', margin.top + chartHeight);
+            xAxis.setAttribute('x2', margin.left + chartWidth);
+            xAxis.setAttribute('y2', margin.top + chartHeight);
+            xAxis.setAttribute('stroke', '#cccccc');
+            xAxis.setAttribute('stroke-width', '0.5');
+            svg.appendChild(xAxis);
+
+            // Dati e barre
             analysisData.forEach((data, index) => {
-                const x = margin.left + index * barSpacing + (barSpacing - barWidth) / 2;
-                
-                // Barra azzurra (media generale)
+                const x = margin.left + index * (chartWidth / analysisData.length) + barSpacing / 2;
+
+                // Barra per media generale (senza bordo)
                 const barHeight = data.avgAll * yScale;
-                const barY = margin.top + chartHeight - barHeight;
-                
                 const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 bar.setAttribute('x', x);
-                bar.setAttribute('y', barY);
+                bar.setAttribute('y', margin.top + chartHeight - barHeight);
                 bar.setAttribute('width', barWidth);
                 bar.setAttribute('height', barHeight);
                 bar.setAttribute('fill', lightBlue);
+                // Rimossi stroke e stroke-width (niente bordi blu)
                 svg.appendChild(bar);
 
-                // Marker blu scuro (argomento specifico) se presente
-                if (data.avgTopic !== null && data.avgTopic > 0) {
+                // Etichette valore barra RIMOSSE per evitare sovrapposizioni
+
+                // Marker per argomento specifico
+                if (data.avgTopic !== null) {
                     const markerY = margin.top + chartHeight - (data.avgTopic * yScale);
-                    
-                    // Cerchio marker
                     const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
                     marker.setAttribute('cx', x + barWidth / 2);
                     marker.setAttribute('cy', markerY);
@@ -896,13 +933,13 @@
                     marker.setAttribute('stroke-width', '2');
                     svg.appendChild(marker);
 
-                    // Etichetta valore
+                    // Etichetta marker (manteniamo questa per il valore specifico del topic)
                     const valueLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     valueLabel.setAttribute('x', x + barWidth / 2);
                     valueLabel.setAttribute('y', markerY - 15);
                     valueLabel.setAttribute('text-anchor', 'middle');
                     valueLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-                    valueLabel.setAttribute('font-size', '11');
+                    valueLabel.setAttribute('font-size', '14'); // Font più grande per valori argomento
                     valueLabel.setAttribute('font-weight', 'bold');
                     valueLabel.setAttribute('fill', darkBlue);
                     valueLabel.textContent = formatNumber(data.avgTopic);
@@ -916,50 +953,12 @@
                 xLabel.setAttribute('text-anchor', 'middle');
                 xLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
                 xLabel.setAttribute('font-size', '12');
-                xLabel.setAttribute('fill', gray);
+                xLabel.setAttribute('fill', darkGray);
                 xLabel.textContent = formatPeriodLabel(data.period, period);
                 svg.appendChild(xLabel);
             });
 
-            // Legenda in basso a sinistra
-            const legendX = margin.left;
-            const legendY = margin.top + chartHeight + 50;
-            
-            // Legenda barra azzurra
-            const legendBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            legendBar.setAttribute('x', legendX);
-            legendBar.setAttribute('y', legendY);
-            legendBar.setAttribute('width', '15');
-            legendBar.setAttribute('height', '15');
-            legendBar.setAttribute('fill', lightBlue);
-            svg.appendChild(legendBar);
-
-            const legendText1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            legendText1.setAttribute('x', legendX + 25);
-            legendText1.setAttribute('y', legendY + 12);
-            legendText1.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-            legendText1.setAttribute('font-size', '12');
-            legendText1.setAttribute('fill', gray);
-            legendText1.textContent = 'Media generale';
-            svg.appendChild(legendText1);
-
-            // Legenda marker
-            const legendMarker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            legendMarker.setAttribute('cx', legendX + 150);
-            legendMarker.setAttribute('cy', legendY);
-            legendMarker.setAttribute('r', '6');
-            legendMarker.setAttribute('fill', darkBlue);
-            svg.appendChild(legendMarker);
-
-            const legendText2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            legendText2.setAttribute('x', legendX + 175);
-            legendText2.setAttribute('y', legendY + 12);
-            legendText2.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-            legendText2.setAttribute('font-size', '12');
-            legendText2.setAttribute('fill', gray);
-            const truncatedTopic = topic.length > 20 ? topic.substring(0, 17) + '...' : topic;
-            legendText2.textContent = `"${truncatedTopic}"`;
-            svg.appendChild(legendText2);
+            // Legenda rimossa come richiesto
         }
 
         function createStatsChart(analysisData, topic, kpi) {
@@ -967,107 +966,124 @@
             svg.innerHTML = '';
             
             const width = 400;
-            const height = 250;
+            const height = 200; // Altezza ridotta per design più compatto
             
             // Usa viewBox per mantenere le proporzioni
             svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
             
             // Colori
-            const lightBlue = '#bfd7fd';
+            const lightBlue = '#d6e6fe';
             const darkBlue = '#0066cc';
-            const gray = '#3b3b3a';
+            const gray = '#666666';
 
-            // Sfondo
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('width', width);
-            rect.setAttribute('height', height);
-            rect.setAttribute('fill', 'white');
-            svg.appendChild(rect);
+            // Sfondo trasparente (rimosso)
 
-            // Titolo con argomento specifico tra virgolette
-            const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            title.setAttribute('x', width / 2);
-            title.setAttribute('y', 25);
-            title.setAttribute('text-anchor', 'middle');
-            title.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-            title.setAttribute('font-size', '14');
-            title.setAttribute('font-weight', 'bold');
-            title.setAttribute('fill', darkBlue);
-            title.textContent = `Riepilogo Statistiche - ${kpi}`;
-            svg.appendChild(title);
+            // CORREZIONE: Calcola le statistiche correttamente
+            // Somma diretta dei post da excelData invece che dai periodi raggruppati
+            let totalPosts, topicPostsCount;
+            
+            // Filtra i dati in base al canale (stesso filtro usato nell'analisi)
+            let filteredData = excelData;
+            if (document.getElementById('channelSelect').value !== 'tutti') {
+                filteredData = excelData.filter(row => row.Canale === document.getElementById('channelSelect').value);
+            }
+            
+            totalPosts = filteredData.length;
+            
+            // Conta i post con l'argomento specifico (case-insensitive)
+            const topicLower = topic.toLowerCase();
+            topicPostsCount = filteredData.filter(row => 
+                row.Argomento && row.Argomento.toLowerCase().includes(topicLower)
+            ).length;
 
-            // Sottotitolo con argomento
-            const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            subtitle.setAttribute('x', width / 2);
-            subtitle.setAttribute('y', 45);
-            subtitle.setAttribute('text-anchor', 'middle');
-            subtitle.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-            subtitle.setAttribute('font-size', '12');
-            subtitle.setAttribute('fill', gray);
-            const truncatedTopic = topic.length > 30 ? topic.substring(0, 27) + '...' : topic;
-            subtitle.textContent = `Argomento: "${truncatedTopic}"`;
-            svg.appendChild(subtitle);
+            if (totalPosts === 0 || !analysisData || analysisData.length === 0) {
+                const noDataText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                noDataText.setAttribute('x', width / 2);
+                noDataText.setAttribute('y', height / 2);
+                noDataText.setAttribute('text-anchor', 'middle');
+                noDataText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+                noDataText.setAttribute('font-size', '14');
+                noDataText.setAttribute('fill', gray);
+                noDataText.textContent = 'Nessun dato disponibile per la visualizzazione.';
+                svg.appendChild(noDataText);
+                return;
+            }
 
-            // Calcola le statistiche
-            const totalPosts = analysisData.reduce((sum, d) => sum + d.totalPosts, 0);
-            const topicPostsCount = analysisData.reduce((sum, d) => sum + d.topicPosts, 0);
-            const avgAll = analysisData.reduce((sum, d) => sum + d.avgAll, 0) / analysisData.length;
-            const topicData = analysisData.filter(d => d.avgTopic !== null);
-            const avgTopic = topicData.length > 0 ? 
-                topicData.reduce((sum, d) => sum + d.avgTopic, 0) / topicData.length : 0;
+            // Calcola il valore medio dell'argomento
+            const avgTopicValue = analysisData.reduce((sum, d) => sum + (d.avgTopic || 0), 0) / analysisData.length;
+            
+            // Layout per gli indicatori
+            const indicatorSpacing = width / 3;
+            const yPos = height / 2;
 
-            // Posizioni per i box informativi
-            const boxes = [
-                { label: 'Post Totali', value: totalPosts, x: 50, y: 85 },
-                { label: 'Post Argomento', value: topicPostsCount, x: 250, y: 85 },
-                { label: 'Media Generale', value: avgAll, x: 50, y: 145 },
-                { label: 'Media Argomento', value: avgTopic, x: 250, y: 145 }
-            ];
-
-            boxes.forEach(box => {
-                // Box
-                const boxRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                boxRect.setAttribute('x', box.x - 40);
-                boxRect.setAttribute('y', box.y - 20);
-                boxRect.setAttribute('width', '130');
-                boxRect.setAttribute('height', '50');
-                boxRect.setAttribute('fill', lightBlue);
-                boxRect.setAttribute('stroke', darkBlue);
-                boxRect.setAttribute('rx', '5');
-                svg.appendChild(boxRect);
-
-                // Valore
-                const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                valueText.setAttribute('x', box.x + 25);
-                valueText.setAttribute('y', box.y - 2);
-                valueText.setAttribute('text-anchor', 'middle');
-                valueText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-                valueText.setAttribute('font-size', '18');
-                valueText.setAttribute('font-weight', 'bold');
-                valueText.setAttribute('fill', darkBlue);
-                valueText.textContent = formatNumber(box.value);
-                svg.appendChild(valueText);
-
-                // Etichetta
-                const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                labelText.setAttribute('x', box.x + 25);
-                labelText.setAttribute('y', box.y + 15);
-                labelText.setAttribute('text-anchor', 'middle');
-                labelText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-                labelText.setAttribute('font-size', '10');
-                labelText.setAttribute('fill', gray);
-                labelText.textContent = box.label;
-                svg.appendChild(labelText);
-            });
+            // Indicatore 1: Posts Totali
+            createIndicator(svg, indicatorSpacing * 0.5, yPos, formatNumber(totalPosts), 'Posts Totali', gray);
+            
+            // Indicatore 2: Posts Argomento
+            createIndicator(svg, indicatorSpacing * 1.5, yPos, formatNumber(topicPostsCount), `Posts "${topic.length > 20 ? topic.substring(0, 17) + '...' : topic}"`, darkBlue);
+            
+            // Indicatore 3: Media KPI
+            createIndicator(svg, indicatorSpacing * 2.5, yPos, formatNumber(avgTopicValue), `Media ${kpi}`, darkBlue);
         }
 
+        // Funzione helper per creare indicatori semplificati
+        function createIndicator(svg, x, y, value, label, color) {
+            // Valore principale
+            const valueText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            valueText.setAttribute('x', x);
+            valueText.setAttribute('y', y - 10);
+            valueText.setAttribute('text-anchor', 'middle');
+            valueText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            valueText.setAttribute('font-size', '24');
+            valueText.setAttribute('font-weight', 'bold');
+            valueText.setAttribute('fill', color);
+            valueText.textContent = value;
+            svg.appendChild(valueText);
+
+            // Cerchio decorativo
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y + 15);
+            circle.setAttribute('r', '4');
+            circle.setAttribute('fill', color);
+            svg.appendChild(circle);
+
+            // Label
+            const labelText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            labelText.setAttribute('x', x);
+            labelText.setAttribute('y', y + 35);
+            labelText.setAttribute('text-anchor', 'middle');
+            labelText.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
+            labelText.setAttribute('font-size', '11');
+            labelText.setAttribute('fill', '#999999');
+            labelText.textContent = label;
+            svg.appendChild(labelText);
+        }
+
+        // CORREZIONE: Aggiorna la funzione updateStatistics per usare il conteggio diretto
         function updateStatistics(analysisData, topic, kpi) {
-            const totalPosts = analysisData.reduce((sum, d) => sum + d.totalPosts, 0);
-            const topicPostsCount = analysisData.reduce((sum, d) => sum + d.topicPosts, 0);
-            const avgAll = analysisData.reduce((sum, d) => sum + d.avgAll, 0) / analysisData.length;
-            const topicData = analysisData.filter(d => d.avgTopic !== null);
-            const avgTopic = topicData.length > 0 ? 
-                topicData.reduce((sum, d) => sum + d.avgTopic, 0) / topicData.length : 0;
+            // Filtra i dati in base al canale (stesso filtro usato nell'analisi)
+            let filteredData = excelData;
+            if (document.getElementById('channelSelect').value !== 'tutti') {
+                filteredData = excelData.filter(row => row.Canale === document.getElementById('channelSelect').value);
+            }
+            
+            const totalPosts = filteredData.length;
+            const topicPostsCount = filteredData.filter(row => row.Argomento === topic).length;
+            
+            // Calcola medie più accurate usando solo periodi con dati validi
+            const validPeriods = analysisData.filter(d => d.avgAll > 0);
+            const avgAll = validPeriods.length > 0 ? 
+                validPeriods.reduce((sum, d) => sum + d.avgAll, 0) / validPeriods.length : 0;
+            
+            const topicPeriods = analysisData.filter(d => d.avgTopic !== null && d.avgTopic > 0);
+            const avgTopic = topicPeriods.length > 0 ? 
+                topicPeriods.reduce((sum, d) => sum + d.avgTopic, 0) / topicPeriods.length : 0;
+
+            console.log('Statistics calculated:', {
+                totalPosts, topicPostsCount, avgAll, avgTopic,
+                validPeriods: validPeriods.length, topicPeriods: topicPeriods.length
+            });
 
             document.getElementById('totalPosts').textContent = formatNumber(totalPosts);
             document.getElementById('topicPosts').textContent = formatNumber(topicPostsCount);
