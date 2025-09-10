@@ -216,6 +216,12 @@
         .stat-label {
             font-size: 0.9rem;
             color: #666;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.2;
         }
 
         .chart-container {
@@ -270,7 +276,7 @@
             display: none;
         }
 
-        #chartPreview, #statsPreview {
+        #chartPreview {
             width: 100%;
             max-width: 100%;
             height: auto;
@@ -357,6 +363,12 @@
                     <input type="checkbox" id="allDataCheckbox" checked>
                     <label for="allDataCheckbox">Usa tutti i dati (ignora il periodo)</label>
                 </div>
+
+                <div class="form-group">
+                    <label for="topicTitleInput">Titolo per l'argomento/i selezionato/i</label>
+                    <input type="text" id="topicTitleInput" placeholder="Es: 'Educazione Finanziaria'" />
+                </div>
+                
                 <div class="form-row">
                     <div class="form-group">
                         <label for="topicFilter">Filtra argomenti</label>
@@ -429,11 +441,11 @@
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div id="totalPosts" class="stat-value">-</div>
-                            <div class="stat-label">Post Totali (nel periodo)</div>
+                            <div class="stat-label">Post Totali</div>
                         </div>
                         <div class="stat-card">
                             <div id="topicPosts" class="stat-value">-</div>
-                            <div class="stat-label">Post Argomenti Selez.</div>
+                            <div id="topicPostsLabel" class="stat-label">Numero post Argomento Selez.</div>
                         </div>
                         <div class="stat-card">
                             <div id="avgOverall" class="stat-value">-</div>
@@ -441,7 +453,7 @@
                         </div>
                         <div class="stat-card">
                             <div id="avgTopic" class="stat-value">-</div>
-                            <div class="stat-label">Media Argomenti Selez.</div>
+                            <div id="avgTopicLabel" class="stat-label">Media Argomento Selez.</div>
                         </div>
                     </div>
                 </div>
@@ -454,8 +466,6 @@
                         </text>
                     </svg>
                 </div>
-
-
 
                 <div class="download-section">
                     <button id="downloadChart" class="btn btn-secondary" onclick="downloadSVG('chart')">
@@ -491,6 +501,7 @@
         const fileStatus = document.getElementById('fileStatus');
         const configSections = document.getElementById('configSections');
         const resultsSection = document.getElementById('resultsSection');
+        const topicTitleInput = document.getElementById('topicTitleInput');
         const topicFilter = document.getElementById('topicFilter');
         const topicSelect = document.getElementById('topicSelect');
         const kpiSelect = document.getElementById('kpiSelect');
@@ -498,20 +509,23 @@
         const periodSelect = document.getElementById('periodSelect');
         const generateBtn = document.getElementById('generateBtn');
         const messageDiv = document.getElementById('message');
-        // NUOVI Riferimenti DOM
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         const allDataCheckbox = document.getElementById('allDataCheckbox');
+        const topicPostsLabel = document.getElementById('topicPostsLabel');
+        const avgTopicLabel = document.getElementById('avgTopicLabel');
 
         // Event listeners
         fileInput.addEventListener('change', handleFileUpload);
         topicFilter.addEventListener('input', filterTopics);
         generateBtn.addEventListener('click', generateAnalysis);
-        // NUOVO Event Listener
         allDataCheckbox.addEventListener('change', (e) => {
             startDateInput.disabled = e.target.checked;
             endDateInput.disabled = e.target.checked;
         });
+        kpiSelect.addEventListener('change', updateTopicLabels); 
+        topicTitleInput.addEventListener('input', updateTopicLabels);
+
 
         function showMessage(message, isError = false) {
             messageDiv.textContent = message;
@@ -562,6 +576,7 @@
                 populateSelectors();
                 configSections.classList.remove('hidden');
                 showMessage('File caricato con successo!', false);
+                updateTopicLabels();
             } catch (error) {
                 console.error('Errore nel caricamento:', error);
                 showMessage(error.message || 'Errore nel caricamento del file. Verificare il formato.', true);
@@ -589,17 +604,14 @@
             });
         }
         
-        // NUOVA FUNZIONE HELPER per il parsing delle date
         function parseDate(dateValue) {
             if (!dateValue) return null;
             
             let date;
             try {
                 if (typeof dateValue === 'number') {
-                    // Date Excel in formato numerico
                     date = new Date((dateValue - 25569) * 86400 * 1000);
                 } else if (typeof dateValue === 'string') {
-                    // Gestione del formato DD/MM/YYYY italiano
                     if (dateValue.includes('/')) {
                         const parts = dateValue.split(' ')[0].split('/');
                         if (parts.length === 3) {
@@ -617,7 +629,6 @@
                     date = new Date(dateValue);
                 }
                 
-                // Ritorna null se la data non è valida
                 if (isNaN(date.getTime())) {
                     return null;
                 }
@@ -630,7 +641,6 @@
             }
         }
 
-
         function processExcelData(data) {
             const editorialData = data.filter(row => 
                 row.Campagna && row.Campagna.toString().toLowerCase() === 'editoriale'
@@ -640,17 +650,15 @@
                 throw new Error('Nessun dato trovato con Campagna = "Editoriale"');
             }
 
-            // MODIFICATO: processa le date una sola volta
             excelData = editorialData.map(row => ({
                 ...row,
                 parsedDate: parseDate(row.Data)
-            })).filter(row => row.parsedDate !== null); // Rimuove le righe con date non valide
+            })).filter(row => row.parsedDate !== null);
 
             if (excelData.length === 0) {
                 throw new Error('Nessun dato con date valide trovato.');
             }
 
-            // Estrai argomenti e canali unici
             allTopics = [...new Set(excelData.map(row => row.Argomento).filter(Boolean))].sort();
             allChannels = [...new Set(excelData.map(row => row.Canale).filter(Boolean))].sort();
 
@@ -658,8 +666,7 @@
         }
 
         function populateSelectors() {
-            // Popola argomenti
-            topicSelect.innerHTML = ''; // Rimuove opzioni precedenti
+            topicSelect.innerHTML = '';
             allTopics.forEach(topic => {
                 const option = document.createElement('option');
                 option.value = topic;
@@ -667,7 +674,6 @@
                 topicSelect.appendChild(option);
             });
 
-            // Popola canali
             channelSelect.innerHTML = '<option value="tutti">Tutti i canali</option>';
             allChannels.forEach(channel => {
                 const option = document.createElement('option');
@@ -696,16 +702,24 @@
             });
         }
 
+        function updateTopicLabels() {
+            const topicTitle = topicTitleInput.value.trim();
+            const kpiText = kpiSelect.options[kpiSelect.selectedIndex].text;
+
+            topicPostsLabel.innerHTML = `Numero post<br>${topicTitle || 'Argomento Selez.'}`;
+            avgTopicLabel.innerHTML = `Media ${kpiText}<br>${topicTitle || 'Argomento Selez.'}`;
+        }
+
+
         function generateAnalysis() {
-            // MODIFICATO: gestione selezione multipla
             const selectedTopics = Array.from(topicSelect.selectedOptions).map(opt => opt.value);
             const kpi = kpiSelect.value;
             const channel = channelSelect.value;
             const period = periodSelect.value;
-            // NUOVO: gestione date
             const useAllData = allDataCheckbox.checked;
             const startDate = useAllData ? null : new Date(startDateInput.value);
             const endDate = useAllData ? null : new Date(endDateInput.value);
+            const topicTitle = topicTitleInput.value.trim();
 
             if (selectedTopics.length === 0) {
                 showMessage('Seleziona almeno un argomento per continuare.', true);
@@ -719,15 +733,18 @@
                  showMessage('La data di inizio non può essere successiva alla data di fine.', true);
                 return;
             }
+            if (!topicTitle) {
+                showMessage('Inserisci un titolo per l\'argomento.', true);
+                return;
+            }
 
             const originalText = generateBtn.innerHTML;
             updateButtonState(generateBtn, 'loading', originalText);
 
             try {
-                // Passa i nuovi parametri
                 const analysisData = prepareAnalysisData(selectedTopics, kpi, channel, period, { useAllData, startDate, endDate });
                 createCharts(analysisData, selectedTopics, kpi, channel, period);
-                updateStatistics(analysisData, selectedTopics, channel, { useAllData, startDate, endDate });
+                updateStatistics(analysisData, selectedTopics, channel, kpi, topicTitle, { useAllData, startDate, endDate });
                 
                 resultsSection.classList.remove('hidden');
                 updateButtonState(generateBtn, 'success', originalText);
@@ -744,9 +761,7 @@
         function prepareAnalysisData(topics, kpi, channel, period, dateRange) {
             let workingData = excelData;
 
-            // 1. Filtro per data
             if (!dateRange.useAllData) {
-                // Imposta l'ora di fine a 23:59:59 per includere tutto il giorno
                 const endOfDay = new Date(dateRange.endDate);
                 endOfDay.setHours(23, 59, 59, 999);
                 
@@ -756,28 +771,24 @@
                 });
             }
 
-            // 2. Filtro per canale
             if (channel !== 'tutti') {
                 workingData = workingData.filter(row => row.Canale === channel);
             }
 
-            // 3. Raggruppamento per periodo
             const groupedData = groupByPeriod(workingData, period);
             
-            // 4. Calcolo medie
             const analysisData = [];
             
             Object.keys(groupedData).sort().forEach(periodKey => {
                 const periodData = groupedData[periodKey];
                 const allPosts = periodData;
-                // MODIFICATO: filtro per array di argomenti
                 const topicPosts = periodData.filter(row => topics.includes(row.Argomento));
                 
                 if (allPosts.length > 0) {
                     const avgAll = calculateAverage(allPosts, kpi);
                     const avgTopic = topicPosts.length > 0 ? calculateAverage(topicPosts, kpi) : null;
                     
-                    if (avgAll > 0 || avgTopic > 0) {
+                    if (avgAll > 0 || (avgTopic !== null && avgTopic > 0)) {
                         analysisData.push({
                             period: periodKey,
                             avgAll: avgAll,
@@ -792,13 +803,12 @@
             return analysisData;
         }
 
-        // MODIFICATO: Usa le date già parsate
         function groupByPeriod(data, period) {
             const grouped = {};
             
             data.forEach(row => {
                 const date = row.parsedDate;
-                if (!date) return; // Salta se la data non è valida
+                if (!date) return;
                 
                 let periodKey;
                 switch (period) {
@@ -1009,11 +1019,9 @@
             });
         }
 
-        // MODIFICATO: per usare i nuovi filtri
-        function updateStatistics(analysisData, topics, channel, dateRange) {
+        function updateStatistics(analysisData, topics, channel, kpi, topicTitle, dateRange) {
             let filteredData = excelData;
 
-            // Applica filtri di data e canale per avere conteggi corretti
             if (!dateRange.useAllData) {
                  const endOfDay = new Date(dateRange.endDate);
                 endOfDay.setHours(23, 59, 59, 999);
@@ -1041,6 +1049,12 @@
             document.getElementById('topicPosts').textContent = formatNumber(topicPostsCount);
             document.getElementById('avgOverall').textContent = formatNumber(avgAll);
             document.getElementById('avgTopic').textContent = formatNumber(avgTopic);
+
+            const kpiText = kpiSelect.options[kpiSelect.selectedIndex].text;
+            
+            // *** MODIFICA APPLICATA QUI ***
+            topicPostsLabel.innerHTML = `Numero post<br>${topicTitle}`;
+            avgTopicLabel.innerHTML = `Media ${kpiText}<br>${topicTitle}`;
         }
 
         function downloadSVG(type) {
