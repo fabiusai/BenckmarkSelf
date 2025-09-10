@@ -90,7 +90,8 @@
 
         input[type="file"],
         select,
-        input[type="text"] {
+        input[type="text"],
+        input[type="date"] {
             width: 100%;
             padding: 12px 16px;
             border: 2px solid #e9ecef;
@@ -99,13 +100,31 @@
             transition: all 0.3s ease;
             background: white;
         }
+        
+        select[multiple] {
+            height: 150px;
+            padding: 10px;
+        }
 
         input[type="file"]:focus,
         select:focus,
-        input[type="text"]:focus {
+        input[type="text"]:focus,
+        input[type="date"]:focus {
             outline: none;
             border-color: #0066cc;
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            font-weight: normal;
         }
 
         .search-container {
@@ -298,7 +317,6 @@
             <p>Analizza le performance dei tuoi contenuti social con grafici professionali</p>
         </div>
 
-        <!-- Sezione upload file -->
         <div class="section">
             <h2>
                 <svg class="icon" viewBox="0 0 24 24">
@@ -316,7 +334,6 @@
             </div>
         </div>
 
-        <!-- Sezione configurazione -->
         <div id="configSections" class="hidden">
             <div class="section">
                 <h2>
@@ -328,6 +345,20 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label for="startDate">Dal</label>
+                        <input type="date" id="startDate" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="endDate">Al</label>
+                        <input type="date" id="endDate" disabled>
+                    </div>
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="allDataCheckbox" checked>
+                    <label for="allDataCheckbox">Usa tutti i dati (ignora il periodo)</label>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
                         <label for="topicFilter">Filtra argomenti</label>
                         <div class="search-container">
                             <input type="text" id="topicFilter" placeholder="Digita per filtrare..." />
@@ -337,10 +368,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="topicSelect">Argomento da analizzare</label>
-                        <select id="topicSelect">
-                            <option value="">Seleziona un argomento...</option>
-                        </select>
+                         <label for="topicSelect">Argomenti da analizzare (Ctrl+Click per selezionare più)</label>
+                        <select id="topicSelect" multiple>
+                            </select>
                     </div>
                 </div>
 
@@ -386,7 +416,6 @@
             </div>
         </div>
 
-        <!-- Sezione risultati -->
         <div id="resultsSection" class="hidden">
             <div class="section">
                 <h2 id="resultsTitle">
@@ -396,16 +425,15 @@
                     Risultati dell'Analisi
                 </h2>
 
-                <!-- Statistiche numeriche (per il download) -->
                 <div id="statsContent">
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div id="totalPosts" class="stat-value">-</div>
-                            <div class="stat-label">Post Totali</div>
+                            <div class="stat-label">Post Totali (nel periodo)</div>
                         </div>
                         <div class="stat-card">
                             <div id="topicPosts" class="stat-value">-</div>
-                            <div class="stat-label">Post Argomento</div>
+                            <div class="stat-label">Post Argomenti Selez.</div>
                         </div>
                         <div class="stat-card">
                             <div id="avgOverall" class="stat-value">-</div>
@@ -413,12 +441,11 @@
                         </div>
                         <div class="stat-card">
                             <div id="avgTopic" class="stat-value">-</div>
-                            <div class="stat-label">Media Argomento</div>
+                            <div class="stat-label">Media Argomenti Selez.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Grafico benchmark -->
                 <div class="chart-container">
                     <h3>Grafico Benchmark</h3>
                     <svg id="chartPreview" width="100%" height="300" style="border: 2px solid #e9ecef; border-radius: 8px;">
@@ -430,7 +457,6 @@
 
 
 
-                <!-- Sezione download -->
                 <div class="download-section">
                     <button id="downloadChart" class="btn btn-secondary" onclick="downloadSVG('chart')">
                         <svg class="icon" viewBox="0 0 24 24">
@@ -448,13 +474,10 @@
             </div>
         </div>
 
-        <!-- Messaggio di stato -->
         <div id="message" class="hidden"></div>
     </div>
 
-    <!-- HTML2Canvas library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- XLSX library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script>
@@ -475,11 +498,20 @@
         const periodSelect = document.getElementById('periodSelect');
         const generateBtn = document.getElementById('generateBtn');
         const messageDiv = document.getElementById('message');
+        // NUOVI Riferimenti DOM
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const allDataCheckbox = document.getElementById('allDataCheckbox');
 
         // Event listeners
         fileInput.addEventListener('change', handleFileUpload);
         topicFilter.addEventListener('input', filterTopics);
         generateBtn.addEventListener('click', generateAnalysis);
+        // NUOVO Event Listener
+        allDataCheckbox.addEventListener('change', (e) => {
+            startDateInput.disabled = e.target.checked;
+            endDateInput.disabled = e.target.checked;
+        });
 
         function showMessage(message, isError = false) {
             messageDiv.textContent = message;
@@ -532,7 +564,7 @@
                 showMessage('File caricato con successo!', false);
             } catch (error) {
                 console.error('Errore nel caricamento:', error);
-                showMessage('Errore nel caricamento del file. Verificare il formato.', true);
+                showMessage(error.message || 'Errore nel caricamento del file. Verificare il formato.', true);
             }
             
             fileStatus.style.display = 'none';
@@ -556,29 +588,78 @@
                 reader.readAsArrayBuffer(file);
             });
         }
+        
+        // NUOVA FUNZIONE HELPER per il parsing delle date
+        function parseDate(dateValue) {
+            if (!dateValue) return null;
+            
+            let date;
+            try {
+                if (typeof dateValue === 'number') {
+                    // Date Excel in formato numerico
+                    date = new Date((dateValue - 25569) * 86400 * 1000);
+                } else if (typeof dateValue === 'string') {
+                    // Gestione del formato DD/MM/YYYY italiano
+                    if (dateValue.includes('/')) {
+                        const parts = dateValue.split(' ')[0].split('/');
+                        if (parts.length === 3) {
+                            const day = parseInt(parts[0], 10);
+                            const month = parseInt(parts[1], 10) - 1; 
+                            const year = parseInt(parts[2], 10);
+                            date = new Date(Date.UTC(year, month, day));
+                        } else {
+                            date = new Date(dateValue);
+                        }
+                    } else {
+                        date = new Date(dateValue);
+                    }
+                } else if (dateValue instanceof Date) {
+                    date = new Date(dateValue);
+                }
+                
+                // Ritorna null se la data non è valida
+                if (isNaN(date.getTime())) {
+                    return null;
+                }
+                
+                return date;
+
+            } catch (error) {
+                console.warn('Errore nel parsing della data:', dateValue, error);
+                return null;
+            }
+        }
+
 
         function processExcelData(data) {
-            // Filtra solo i dati con Campagna = "Editoriale"
-            excelData = data.filter(row => 
+            const editorialData = data.filter(row => 
                 row.Campagna && row.Campagna.toString().toLowerCase() === 'editoriale'
             );
 
-            if (excelData.length === 0) {
+            if (editorialData.length === 0) {
                 throw new Error('Nessun dato trovato con Campagna = "Editoriale"');
+            }
+
+            // MODIFICATO: processa le date una sola volta
+            excelData = editorialData.map(row => ({
+                ...row,
+                parsedDate: parseDate(row.Data)
+            })).filter(row => row.parsedDate !== null); // Rimuove le righe con date non valide
+
+            if (excelData.length === 0) {
+                throw new Error('Nessun dato con date valide trovato.');
             }
 
             // Estrai argomenti e canali unici
             allTopics = [...new Set(excelData.map(row => row.Argomento).filter(Boolean))].sort();
             allChannels = [...new Set(excelData.map(row => row.Canale).filter(Boolean))].sort();
 
-            console.log(`Caricati ${excelData.length} record con Campagna "Editoriale"`);
-            console.log('Argomenti trovati:', allTopics);
-            console.log('Canali trovati:', allChannels);
+            console.log(`Caricati ${excelData.length} record validi.`);
         }
 
         function populateSelectors() {
             // Popola argomenti
-            topicSelect.innerHTML = '<option value="">Seleziona un argomento...</option>';
+            topicSelect.innerHTML = ''; // Rimuove opzioni precedenti
             allTopics.forEach(topic => {
                 const option = document.createElement('option');
                 option.value = topic;
@@ -598,31 +679,44 @@
 
         function filterTopics() {
             const filter = topicFilter.value.toLowerCase();
+            const currentlySelected = Array.from(topicSelect.selectedOptions).map(opt => opt.value);
             
-            // Prima rimuovi tutte le opzioni tranne la prima
-            const firstOption = topicSelect.children[0];
             topicSelect.innerHTML = '';
-            topicSelect.appendChild(firstOption);
             
-            // Aggiungi solo le opzioni che corrispondono al filtro
             allTopics.forEach(topic => {
                 if (topic.toLowerCase().includes(filter)) {
                     const option = document.createElement('option');
                     option.value = topic;
                     option.textContent = topic;
+                    if (currentlySelected.includes(topic)) {
+                        option.selected = true;
+                    }
                     topicSelect.appendChild(option);
                 }
             });
         }
 
         function generateAnalysis() {
-            const topic = topicSelect.value;
+            // MODIFICATO: gestione selezione multipla
+            const selectedTopics = Array.from(topicSelect.selectedOptions).map(opt => opt.value);
             const kpi = kpiSelect.value;
             const channel = channelSelect.value;
             const period = periodSelect.value;
+            // NUOVO: gestione date
+            const useAllData = allDataCheckbox.checked;
+            const startDate = useAllData ? null : new Date(startDateInput.value);
+            const endDate = useAllData ? null : new Date(endDateInput.value);
 
-            if (!topic) {
-                showMessage('Seleziona un argomento per continuare.', true);
+            if (selectedTopics.length === 0) {
+                showMessage('Seleziona almeno un argomento per continuare.', true);
+                return;
+            }
+            if (!useAllData && (isNaN(startDate.getTime()) || isNaN(endDate.getTime()))) {
+                showMessage('Seleziona un periodo valido.', true);
+                return;
+            }
+            if (!useAllData && startDate > endDate) {
+                 showMessage('La data di inizio non può essere successiva alla data di fine.', true);
                 return;
             }
 
@@ -630,15 +724,15 @@
             updateButtonState(generateBtn, 'loading', originalText);
 
             try {
-                const analysisData = prepareAnalysisData(topic, kpi, channel, period);
-                createCharts(analysisData, topic, kpi, channel, period);
-                updateStatistics(analysisData, topic, kpi);
+                // Passa i nuovi parametri
+                const analysisData = prepareAnalysisData(selectedTopics, kpi, channel, period, { useAllData, startDate, endDate });
+                createCharts(analysisData, selectedTopics, kpi, channel, period);
+                updateStatistics(analysisData, selectedTopics, channel, { useAllData, startDate, endDate });
                 
                 resultsSection.classList.remove('hidden');
                 updateButtonState(generateBtn, 'success', originalText);
                 showMessage('Analisi generata con successo!', false);
                 
-                // Scroll to results
                 resultsSection.scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 console.error('Errore nella generazione:', error);
@@ -647,29 +741,42 @@
             }
         }
 
-        function prepareAnalysisData(topic, kpi, channel, period) {
-            // Filtra i dati in base al canale
+        function prepareAnalysisData(topics, kpi, channel, period, dateRange) {
             let workingData = excelData;
-            if (channel !== 'tutti') {
-                workingData = excelData.filter(row => row.Canale === channel);
+
+            // 1. Filtro per data
+            if (!dateRange.useAllData) {
+                // Imposta l'ora di fine a 23:59:59 per includere tutto il giorno
+                const endOfDay = new Date(dateRange.endDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                
+                workingData = workingData.filter(row => {
+                    const rowDate = row.parsedDate;
+                    return rowDate >= dateRange.startDate && rowDate <= endOfDay;
+                });
             }
 
-            // Converti le date e raggruppa per periodo
+            // 2. Filtro per canale
+            if (channel !== 'tutti') {
+                workingData = workingData.filter(row => row.Canale === channel);
+            }
+
+            // 3. Raggruppamento per periodo
             const groupedData = groupByPeriod(workingData, period);
             
-            // Calcola medie per periodo
+            // 4. Calcolo medie
             const analysisData = [];
             
             Object.keys(groupedData).sort().forEach(periodKey => {
                 const periodData = groupedData[periodKey];
                 const allPosts = periodData;
-                const topicPosts = periodData.filter(row => row.Argomento === topic);
+                // MODIFICATO: filtro per array di argomenti
+                const topicPosts = periodData.filter(row => topics.includes(row.Argomento));
                 
                 if (allPosts.length > 0) {
                     const avgAll = calculateAverage(allPosts, kpi);
                     const avgTopic = topicPosts.length > 0 ? calculateAverage(topicPosts, kpi) : null;
                     
-                    // Solo se ci sono dati validi per il periodo
                     if (avgAll > 0 || avgTopic > 0) {
                         analysisData.push({
                             period: periodKey,
@@ -682,53 +789,16 @@
                 }
             });
 
-            console.log('Analysis data prepared:', analysisData);
             return analysisData;
         }
 
-        // FUNZIONE CORRETTA: Parsing migliorato delle date
+        // MODIFICATO: Usa le date già parsate
         function groupByPeriod(data, period) {
             const grouped = {};
             
             data.forEach(row => {
-                if (!row.Data) return;
-                
-                let date;
-                try {
-                    if (typeof row.Data === 'number') {
-                        // Date Excel in formato numerico
-                        date = new Date((row.Data - 25569) * 86400 * 1000);
-                    } else if (typeof row.Data === 'string') {
-                        // Gestione del formato DD/MM/YYYY italiano
-                        if (row.Data.includes('/')) {
-                            const parts = row.Data.split('/');
-                            if (parts.length === 3) {
-                                // Formato DD/MM/YYYY -> crea Date(YYYY, MM-1, DD)
-                                const day = parseInt(parts[0]);
-                                const month = parseInt(parts[1]) - 1; // I mesi in JavaScript sono 0-based
-                                const year = parseInt(parts[2]);
-                                date = new Date(year, month, day);
-                            } else {
-                                date = new Date(row.Data);
-                            }
-                        } else {
-                            date = new Date(row.Data);
-                        }
-                    } else if (row.Data instanceof Date) {
-                        // Già un oggetto Date
-                        date = new Date(row.Data);
-                    } else {
-                        date = new Date(row.Data);
-                    }
-                } catch (error) {
-                    console.warn('Errore nel parsing della data:', row.Data, error);
-                    return; // Salta righe con date non valide
-                }
-                
-                if (isNaN(date.getTime())) {
-                    console.warn('Data non valida:', row.Data);
-                    return;
-                }
+                const date = row.parsedDate;
+                if (!date) return; // Salta se la data non è valida
                 
                 let periodKey;
                 switch (period) {
@@ -737,14 +807,14 @@
                         break;
                     case 'week':
                         const week = getWeekNumber(date);
-                        periodKey = `${date.getFullYear()}-W${week.toString().padStart(2, '0')}`;
+                        periodKey = `${date.getUTCFullYear()}-W${week.toString().padStart(2, '0')}`;
                         break;
                     case '15days':
-                        const day15 = Math.ceil(date.getDate() / 15);
-                        periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-Q${day15}`;
+                        const day15 = Math.ceil(date.getUTCDate() / 15);
+                        periodKey = `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}-Q${day15}`;
                         break;
                     case 'month':
-                        periodKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                        periodKey = `${date.getUTCFullYear()}-${(date.getUTCMonth() + 1).toString().padStart(2, '0')}`;
                         break;
                 }
                 
@@ -758,7 +828,7 @@
         }
 
         function getWeekNumber(date) {
-            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
             const dayNum = d.getUTCDay() || 7;
             d.setUTCDate(d.getUTCDate() + 4 - dayNum);
             const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
@@ -766,7 +836,6 @@
         }
 
         function calculateAverage(data, kpi) {
-            // Filtra solo i valori numerici validi (non null, non undefined, non NaN)
             const values = data.map(row => {
                 const val = parseFloat(row[kpi]);
                 return isNaN(val) ? null : val;
@@ -778,13 +847,11 @@
         function formatNumber(num) {
             if (num >= 1000000) {
                 let formatted = (num / 1000000).toFixed(2);
-                // Rimuove gli zeri finali dopo la virgola
                 formatted = formatted.replace(/\.?0+$/, '');
                 return formatted.replace('.', ',') + 'M';
             }
             if (num >= 1000) {
                 let formatted = (num / 1000).toFixed(2);
-                // Rimuove gli zeri finali dopo la virgola
                 formatted = formatted.replace(/\.?0+$/, '');
                 return formatted.replace('.', ',') + 'K';
             }
@@ -794,10 +861,7 @@
         function formatPeriodLabel(periodKey, period) {
             switch (period) {
                 case 'day':
-                    return new Date(periodKey).toLocaleDateString('it-IT', { 
-                        day: '2-digit', 
-                        month: '2-digit' 
-                    });
+                    return new Date(periodKey + 'T00:00:00Z').toLocaleDateString('it-IT', { timeZone: 'UTC', day: '2-digit', month: '2-digit' });
                 case 'week':
                     const [year, week] = periodKey.split('-W');
                     return `S${week}/${year.substr(2)}`;
@@ -821,41 +885,43 @@
             const svg = document.getElementById('chartPreview');
             svg.innerHTML = '';
             
-            const width = 1200; // Nuova larghezza
-            const height = 300; // Nuova altezza
-            const margin = { top: 40, right: 40, bottom: 50, left: 80 }; // Più spazio a sinistra per scala Y
+            const width = 1200;
+            const height = 300;
+            const margin = { top: 40, right: 40, bottom: 50, left: 80 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
-            // Usa viewBox per mantenere le proporzioni
             svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
 
-            // Colori
-            const lightBlue = '#d6e6fe'; // Colore azzurro più chiaro
+            const lightBlue = '#d6e6fe';
             const darkBlue = '#0066cc';
-            const gray = '#999999'; // Colore grigio più chiaro
+            const gray = '#999999';
             const darkGray = '#3b3b3a';
 
-            // Sfondo trasparente (rimosso)
+            if (analysisData.length === 0) {
+                const emptyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                emptyText.setAttribute('x', '50%');
+                emptyText.setAttribute('y', '50%');
+                emptyText.setAttribute('text-anchor', 'middle');
+                emptyText.setAttribute('font-family', 'Arial, sans-serif');
+                emptyText.setAttribute('font-size', '16');
+                emptyText.setAttribute('fill', '#666');
+                emptyText.textContent = "Nessun dato da visualizzare per i filtri selezionati.";
+                svg.appendChild(emptyText);
+                return;
+            };
 
-            // Titolo rimosso
-
-            if (analysisData.length === 0) return;
-
-            // Calcola le scale
             const maxValue = Math.max(...analysisData.flatMap(d => [d.avgAll, d.avgTopic || 0]));
             const yScale = maxValue > 0 ? chartHeight / maxValue : 1;
 
             const barWidth = chartWidth / analysisData.length * 0.8;
             const barSpacing = chartWidth / analysisData.length * 0.2;
 
-            // Scala Y - Aggiungi linee orizzontali e etichette
             const numTicks = 5;
             for (let i = 0; i <= numTicks; i++) {
                 const tickValue = (maxValue / numTicks) * i;
                 const yPos = margin.top + chartHeight - (tickValue * yScale);
 
-                // Linea orizzontale della griglia (opzionale, molto sottile)
                 if (i > 0) {
                     const gridLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                     gridLine.setAttribute('x1', margin.left);
@@ -867,7 +933,6 @@
                     svg.appendChild(gridLine);
                 }
 
-                // Etichetta numerica grigia sull'asse Y
                 const yLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 yLabel.setAttribute('x', margin.left - 10);
                 yLabel.setAttribute('y', yPos + 4);
@@ -879,7 +944,6 @@
                 svg.appendChild(yLabel);
             }
 
-            // Asse Y
             const yAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             yAxis.setAttribute('x1', margin.left);
             yAxis.setAttribute('y1', margin.top);
@@ -889,7 +953,6 @@
             yAxis.setAttribute('stroke-width', '0.5');
             svg.appendChild(yAxis);
 
-            // Asse X
             const xAxis = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             xAxis.setAttribute('x1', margin.left);
             xAxis.setAttribute('y1', margin.top + chartHeight);
@@ -899,11 +962,9 @@
             xAxis.setAttribute('stroke-width', '0.5');
             svg.appendChild(xAxis);
 
-            // Dati e barre
             analysisData.forEach((data, index) => {
                 const x = margin.left + index * (chartWidth / analysisData.length) + barSpacing / 2;
 
-                // Barra per media generale (senza bordo)
                 const barHeight = data.avgAll * yScale;
                 const bar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
                 bar.setAttribute('x', x);
@@ -911,12 +972,8 @@
                 bar.setAttribute('width', barWidth);
                 bar.setAttribute('height', barHeight);
                 bar.setAttribute('fill', lightBlue);
-                // Rimossi stroke e stroke-width (niente bordi blu)
                 svg.appendChild(bar);
 
-                // Etichette valore barra RIMOSSE per evitare sovrapposizioni
-
-                // Marker per argomento specifico
                 if (data.avgTopic !== null) {
                     const markerY = margin.top + chartHeight - (data.avgTopic * yScale);
                     const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -928,20 +985,18 @@
                     marker.setAttribute('stroke-width', '2');
                     svg.appendChild(marker);
 
-                    // Etichetta marker (manteniamo questa per il valore specifico del topic)
                     const valueLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     valueLabel.setAttribute('x', x + barWidth / 2);
                     valueLabel.setAttribute('y', markerY - 15);
                     valueLabel.setAttribute('text-anchor', 'middle');
                     valueLabel.setAttribute('font-family', 'Avenir Next LT Pro, sans-serif');
-                    valueLabel.setAttribute('font-size', '14'); // Font più grande per valori argomento
+                    valueLabel.setAttribute('font-size', '14');
                     valueLabel.setAttribute('font-weight', 'bold');
                     valueLabel.setAttribute('fill', darkBlue);
                     valueLabel.textContent = formatNumber(data.avgTopic);
                     svg.appendChild(valueLabel);
                 }
 
-                // Etichette asse X
                 const xLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                 xLabel.setAttribute('x', x + barWidth / 2);
                 xLabel.setAttribute('y', margin.top + chartHeight + 20);
@@ -952,22 +1007,28 @@
                 xLabel.textContent = formatPeriodLabel(data.period, period);
                 svg.appendChild(xLabel);
             });
-
-            // Legenda rimossa come richiesto
         }
 
-        // CORREZIONE: Aggiorna la funzione updateStatistics per usare il conteggio diretto
-        function updateStatistics(analysisData, topic, kpi) {
-            // Filtra i dati in base al canale (stesso filtro usato nell'analisi)
+        // MODIFICATO: per usare i nuovi filtri
+        function updateStatistics(analysisData, topics, channel, dateRange) {
             let filteredData = excelData;
-            if (document.getElementById('channelSelect').value !== 'tutti') {
-                filteredData = excelData.filter(row => row.Canale === document.getElementById('channelSelect').value);
+
+            // Applica filtri di data e canale per avere conteggi corretti
+            if (!dateRange.useAllData) {
+                 const endOfDay = new Date(dateRange.endDate);
+                endOfDay.setHours(23, 59, 59, 999);
+                filteredData = filteredData.filter(row => {
+                    const rowDate = row.parsedDate;
+                    return rowDate >= dateRange.startDate && rowDate <= endOfDay;
+                });
+            }
+            if (channel !== 'tutti') {
+                filteredData = filteredData.filter(row => row.Canale === channel);
             }
             
             const totalPosts = filteredData.length;
-            const topicPostsCount = filteredData.filter(row => row.Argomento === topic).length;
+            const topicPostsCount = filteredData.filter(row => topics.includes(row.Argomento)).length;
             
-            // Calcola medie più accurate usando solo periodi con dati validi
             const validPeriods = analysisData.filter(d => d.avgAll > 0);
             const avgAll = validPeriods.length > 0 ? 
                 validPeriods.reduce((sum, d) => sum + d.avgAll, 0) / validPeriods.length : 0;
@@ -975,11 +1036,6 @@
             const topicPeriods = analysisData.filter(d => d.avgTopic !== null && d.avgTopic > 0);
             const avgTopic = topicPeriods.length > 0 ? 
                 topicPeriods.reduce((sum, d) => sum + d.avgTopic, 0) / topicPeriods.length : 0;
-
-            console.log('Statistics calculated:', {
-                totalPosts, topicPostsCount, avgAll, avgTopic,
-                validPeriods: validPeriods.length, topicPeriods: topicPeriods.length
-            });
 
             document.getElementById('totalPosts').textContent = formatNumber(totalPosts);
             document.getElementById('topicPosts').textContent = formatNumber(topicPostsCount);
@@ -1016,9 +1072,8 @@
             try {
                 updateButtonState(button, 'loading', originalText);
                 
-                // Configura html2canvas per una migliore qualità
                 const canvas = await html2canvas(statsContent, {
-                    scale: 2, // Aumenta la qualità dell'immagine
+                    scale: 2,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: '#ffffff',
@@ -1026,7 +1081,6 @@
                     height: statsContent.offsetHeight
                 });
                 
-                // Converti il canvas in blob
                 canvas.toBlob(function(blob) {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
@@ -1046,11 +1100,6 @@
                 updateButtonState(button, 'error', originalText);
             }
         }
-
-        // Inizializzazione
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Social Analytics Dashboard inizializzato');
-        });
     </script>
 </body>
 </html>
