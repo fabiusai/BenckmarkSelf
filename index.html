@@ -640,6 +640,12 @@
                 return null;
             }
         }
+        
+        // NUOVA FUNZIONE HELPER per normalizzare il testo
+        function capitalize(str) {
+            if (!str || typeof str !== 'string') return '';
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
 
         function processExcelData(data) {
             const editorialData = data.filter(row => 
@@ -660,7 +666,9 @@
             }
 
             allTopics = [...new Set(excelData.map(row => row.Argomento).filter(Boolean))].sort();
-            allChannels = [...new Set(excelData.map(row => row.Canale).filter(Boolean))].sort();
+            
+            // MODIFICATO: Usa la funzione capitalize per normalizzare e rendere unici i canali
+            allChannels = [...new Set(excelData.map(row => capitalize(row.Canale)).filter(Boolean))].sort();
 
             console.log(`Caricati ${excelData.length} record validi.`);
         }
@@ -771,8 +779,9 @@
                 });
             }
 
+            // MODIFICATO: Usa capitalize per un confronto corretto
             if (channel !== 'tutti') {
-                workingData = workingData.filter(row => row.Canale === channel);
+                workingData = workingData.filter(row => capitalize(row.Canale) === channel);
             }
 
             const groupedData = groupByPeriod(workingData, period);
@@ -1030,8 +1039,10 @@
                     return rowDate >= dateRange.startDate && rowDate <= endOfDay;
                 });
             }
+            
+            // MODIFICATO: Usa capitalize per un confronto corretto
             if (channel !== 'tutti') {
-                filteredData = filteredData.filter(row => row.Canale === channel);
+                filteredData = filteredData.filter(row => capitalize(row.Canale) === channel);
             }
             
             const totalPosts = filteredData.length;
@@ -1052,7 +1063,6 @@
 
             const kpiText = kpiSelect.options[kpiSelect.selectedIndex].text;
             
-            // *** MODIFICA APPLICATA QUI ***
             topicPostsLabel.innerHTML = `Numero post<br>${topicTitle}`;
             avgTopicLabel.innerHTML = `Media ${kpiText}<br>${topicTitle}`;
         }
